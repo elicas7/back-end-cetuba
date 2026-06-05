@@ -3,11 +3,11 @@
 console.log("🔥 SERVER EXECUTANDO AGORA");
 
 const path = require('path');
-require('dotenv').config(); // ⚠️ no Railway NÃO precisa path custom
+require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
-const { Pool } = require('pg'); // 🔥 ADICIONADO
+const { Pool } = require('pg');
 
 const app = express();
 
@@ -18,14 +18,13 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 });
 
-// deixar disponível pra rotas usarem
 app.use((req, res, next) => {
   req.db = pool;
   next();
 });
 
 
-// ── Middleware global ──────────────────────────────────
+// ── MIDDLEWARE ─────────────────────────────────────────
 app.use(cors({
   origin: process.env.ALLOWED_ORIGINS?.split(',') || '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -36,8 +35,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
-// ── Frontend ───────────────────────────────────────────
-const frontendDir = path.resolve(__dirname, './frontend');
+// ── FRONTEND ───────────────────────────────────────────
+const frontendDir = path.resolve(__dirname, '../frontend');
+
+console.log("📁 Frontend dir:", frontendDir);
 
 app.use(express.static(frontendDir));
 
@@ -46,7 +47,7 @@ app.get('/', (req, res) => {
 });
 
 
-// ── Arquivos estáticos (uploads) ───────────────────────
+// ── UPLOADS ────────────────────────────────────────────
 const uploadsDir = path.resolve(
   __dirname,
   '../',
@@ -56,59 +57,64 @@ const uploadsDir = path.resolve(
 app.use('/uploads', express.static(uploadsDir));
 
 
-// ── ROTAS DA API ───────────────────────────────────────
-app.use('/auth',      require('./routes/auth'));
-app.use('/avisos',    require('./routes/avisos'));
-app.use('/materiais', require('./routes/materiais'));
-app.use('/resumos',   require('./routes/resumos'));
-app.use('/provas',    require('./routes/provas'));
-app.use('/eventos',   require('./routes/eventos'));
-app.use('/membros',   require('./routes/membros'));
+// ── ROTAS DA API (COM DEBUG FORÇADO) ───────────────────
+try {
+  console.log("🔗 Carregando rotas...");
+
+  app.use('/auth', require('./routes/auth'));
+  app.use('/avisos', require('./routes/avisos'));
+  app.use('/materiais', require('./routes/materiais'));
+  app.use('/resumos', require('./routes/resumos'));
+  app.use('/provas', require('./routes/provas'));
+  app.use('/eventos', require('./routes/eventos'));
+  app.use('/membros', require('./routes/membros'));
+
+  console.log("✅ Rotas carregadas com sucesso");
+} catch (err) {
+  console.error("❌ ERRO AO CARREGAR ROTAS:", err);
+}
 
 
-// ── 🔥 TESTE DE BANCO (NOVO) ───────────────────────────
+// ── TESTE DB ───────────────────────────────────────────
 app.get('/test-db', async (req, res) => {
   try {
     const result = await pool.query('SELECT NOW()');
-    res.json({
-      ok: true,
-      time: result.rows[0]
-    });
+    res.json({ ok: true, time: result.rows[0] });
   } catch (err) {
-    res.status(500).json({
-      ok: false,
-      error: err.message
-    });
+    res.status(500).json({ ok: false, error: err.message });
   }
 });
 
 
-// ── Health check ───────────────────────────────────────
-app.get('/health', (req, res) => res.json({ ok: true, ts: new Date() }));
+// ── HEALTH ─────────────────────────────────────────────
+app.get('/health', (req, res) => {
+  res.json({ ok: true, ts: new Date() });
+});
 
 
 // ── 404 ────────────────────────────────────────────────
-app.use((req, res) =>
-  res.status(404).json({ message: 'Rota não encontrada.' })
-);
+app.use((req, res) => {
+  res.status(404).json({ message: 'Rota não encontrada.' });
+});
 
 
-// ── Error handler ──────────────────────────────────────
+// ── ERROR HANDLER ──────────────────────────────────────
 app.use((err, req, res, _next) => {
-  console.error('Erro:', err.message);
-  res.status(err.status || 500).json({
+  console.error('Erro:', err);
+  res.status(500).json({
     message: err.message || 'Erro interno do servidor.'
   });
 });
 
 
-// ── Inicialização ──────────────────────────────────────
+// ── START ──────────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
   const dbUrl =
     process.env.DATABASE_URL?.replace(/:\/\/.*@/, '://***@') ||
     'não configurado';
+
   console.log(`\n🚀 Central da Turma API rodando em http://localhost:${PORT}`);
   console.log(`🗄️ Banco: ${dbUrl}`);
   console.log(`🌍 Env: ${process.env.NODE_ENV || 'development'}\n`);
