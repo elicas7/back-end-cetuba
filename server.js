@@ -1,5 +1,7 @@
 // backend/server.js — Servidor principal da Central da Turma
 
+console.log("🔥 SERVER EXECUTANDO AGORA");
+
 const path = require('path');
 require('dotenv').config(); // ⚠️ no Railway NÃO precisa path custom
 
@@ -107,7 +109,6 @@ app.listen(PORT, () => {
   const dbUrl =
     process.env.DATABASE_URL?.replace(/:\/\/.*@/, '://***@') ||
     'não configurado';
-  console.log("TESTE AUTH IMPORT:", require('./routes/auth'));
   console.log(`\n🚀 Central da Turma API rodando em http://localhost:${PORT}`);
   console.log(`🗄️ Banco: ${dbUrl}`);
   console.log(`🌍 Env: ${process.env.NODE_ENV || 'development'}\n`);
