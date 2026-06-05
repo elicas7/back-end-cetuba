@@ -29,14 +29,32 @@ app.get('/', (req, res) => {
 const uploadsDir = path.resolve(__dirname, 'uploads');
 app.use('/uploads', express.static(uploadsDir));
 
-// ── ROTAS DA API ──────────────────────────────────────────
-app.use('/auth',      require('./routes/auth'));
-app.use('/avisos',    require('./routes/avisos'));
-app.use('/eventos',   require('./routes/eventos'));
-app.use('/materiais', require('./routes/materiais'));
-app.use('/membros',   require('./routes/membros'));
-app.use('/provas',    require('./routes/provas'));
-app.use('/resumos',   require('./routes/resumos'));
+// ── ROTAS DA API (com e sem prefixo /api) ─────────────────
+const authRouter      = require('./routes/auth');
+const avisosRouter    = require('./routes/avisos');
+const eventosRouter   = require('./routes/eventos');
+const materiaisRouter = require('./routes/materiais');
+const membrosRouter   = require('./routes/membros');
+const provasRouter    = require('./routes/provas');
+const resumosRouter   = require('./routes/resumos');
+
+// sem prefixo  → /auth/login
+app.use('/auth',      authRouter);
+app.use('/avisos',    avisosRouter);
+app.use('/eventos',   eventosRouter);
+app.use('/materiais', materiaisRouter);
+app.use('/membros',   membrosRouter);
+app.use('/provas',    provasRouter);
+app.use('/resumos',   resumosRouter);
+
+// com prefixo  → /api/auth/login
+app.use('/api/auth',      authRouter);
+app.use('/api/avisos',    avisosRouter);
+app.use('/api/eventos',   eventosRouter);
+app.use('/api/materiais', materiaisRouter);
+app.use('/api/membros',   membrosRouter);
+app.use('/api/provas',    provasRouter);
+app.use('/api/resumos',   resumosRouter);
 
 // ── HEALTH / TEST ─────────────────────────────────────────
 app.get('/health', (req, res) => res.json({ ok: true, ts: new Date() }));
