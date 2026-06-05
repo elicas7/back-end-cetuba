@@ -34,7 +34,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ── FRONTEND ──────────────────────────
-const frontendDir = path.resolve(__dirname, '../frontend');
+const frontendDir = path.resolve(__dirname, 'frontend');
 
 app.use(express.static(frontendDir));
 
@@ -43,7 +43,7 @@ app.get('/', (req, res) => {
 });
 
 // ── UPLOADS ───────────────────────────
-const uploadsDir = path.resolve(__dirname, '../backend/uploads/materiais');
+const uploadsDir = path.resolve(__dirname, 'uploads/materiais');
 app.use('/uploads', express.static(uploadsDir));
 
 // ── AUTH ROUTES (INLINE FIXADO) ───────
