@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-  "start": "node server.js && echo SERVER INICIOU"
-}
+    "start": "node server.js && echo SERVER INICIOU"
+  },
   "dependencies": {
     "express": "^4.18.3",
     "pg": "^8.11.5",
