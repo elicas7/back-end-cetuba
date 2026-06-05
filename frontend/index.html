@@ -1,0 +1,1802 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Central da Turma — 7º Ano</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" />
+
+<style>
+/* ─── RESET & BASE ─────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --primary:        #1a56db;
+  --primary-hover:  #1548c2;
+  --primary-light:  #eff6ff;
+  --accent:         #f59e0b;
+  --danger:         #ef4444;
+  --danger-light:   #fee2e2;
+  --success:        #10b981;
+  --success-light:  #dcfce7;
+  --warning-light:  #fef9c3;
+  --warning-text:   #854d0e;
+  --bg:             #f8f9fb;
+  --surface:        #ffffff;
+  --surface-2:      #f1f3f7;
+  --border:         #e5e7eb;
+  --border-soft:    #f0f2f5;
+  --text-1:         #111827;
+  --text-2:         #6b7280;
+  --text-3:         #9ca3af;
+  --sidebar-w:      230px;
+  --radius-sm:      6px;
+  --radius-md:      10px;
+  --radius-lg:      14px;
+  --shadow-sm:      0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:      0 4px 12px rgba(0,0,0,.08);
+  /* Cores dos cargos */
+  --role-dev:       #7c3aed;
+  --role-dev-bg:    #ede9fe;
+  --role-lider:     #1a56db;
+  --role-lider-bg:  #dbeafe;
+  --role-ajuda:     #0891b2;
+  --role-ajuda-bg:  #cffafe;
+  --role-vice:      #6d28d9;
+  --role-vice-bg:   #ede9fe;
+  --role-aluno:     #374151;
+  --role-aluno-bg:  #f3f4f6;
+}
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text-1);
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* ─── UTILITIES ────────────────────────────────────────── */
+.hidden { display: none !important; }
+.tag {
+  display: inline-flex; align-items: center;
+  font-size: 11px; font-weight: 600; letter-spacing: .02em;
+  padding: 2px 9px; border-radius: 20px;
+}
+.tag-blue   { background:#dbeafe; color:#1e40af; }
+.tag-purple { background:#ede9fe; color:#5b21b6; }
+.tag-amber  { background:#fef3c7; color:#92400e; }
+.tag-red    { background:#fee2e2; color:#991b1b; }
+.tag-green  { background:#dcfce7; color:#166534; }
+.tag-gray   { background:#f3f4f6; color:#374151; }
+.tag-orange { background:#ffedd5; color:#9a3412; }
+.tag-teal   { background:#ccfbf1; color:#065f46; }
+.tag-pink   { background:#fce7f3; color:#831843; }
+.tag-sky    { background:#e0f2fe; color:#0c4a6e; }
+.tag-cyan   { background:#cffafe; color:#164e63; }
+.tag-violet { background:#ede9fe; color:#4c1d95; }
+
+/* ─── TOAST ─────────────────────────────────────────────── */
+#toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+  background: #1f2937; color: #fff; padding: 10px 18px;
+  border-radius: var(--radius-md); font-size: 13px; font-weight: 500;
+  box-shadow: var(--shadow-md); opacity: 0; pointer-events: none;
+  transition: opacity .25s;
+}
+#toast.show { opacity: 1; }
+
+/* ─── LOGIN ─────────────────────────────────────────────── */
+#login-screen {
+  min-height: 100vh; display: flex; align-items: center;
+  justify-content: center; background: var(--bg);
+}
+.login-wrap { width: 100%; max-width: 400px; padding: 1rem; }
+.login-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 2.5rem 2rem;
+  box-shadow: var(--shadow-md);
+}
+.login-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 1.75rem; }
+.brand-icon {
+  width: 42px; height: 42px; border-radius: 11px;
+  background: var(--primary); display: flex; align-items: center; justify-content: center;
+}
+.brand-icon i { font-size: 22px; color: #fff; }
+.brand-name { font-size: 18px; font-weight: 600; color: var(--text-1); }
+.brand-sub  { font-size: 12px; color: var(--text-2); margin-top: 1px; }
+.login-title { font-size: 16px; font-weight: 600; color: var(--text-1); margin-bottom: 4px; }
+.login-desc  { font-size: 13px; color: var(--text-2); margin-bottom: 1.5rem; }
+.form-field { margin-bottom: 1rem; }
+.form-field label { display: block; font-size: 12px; font-weight: 600; color: var(--text-2); margin-bottom: 5px; text-transform: uppercase; letter-spacing: .04em; }
+.form-field input {
+  width: 100%; padding: 9px 12px; font-size: 14px; font-family: inherit;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--surface); color: var(--text-1);
+  transition: border-color .15s, box-shadow .15s;
+}
+.form-field input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26,86,219,.1); }
+.btn-login {
+  width: 100%; padding: 10px; background: var(--primary); color: #fff;
+  border: none; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600;
+  cursor: pointer; margin-top: 4px; transition: background .15s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-login:hover { background: var(--primary-hover); }
+.login-err { font-size: 12px; color: var(--danger); margin-top: 8px; }
+.login-info { font-size: 12px; color: var(--text-2); margin-top: 12px; text-align: center; }
+
+/* ─── MAIN APP ──────────────────────────────────────────── */
+#app { display: none; min-height: 100vh; }
+.layout { display: flex; min-height: 100vh; }
+
+/* ─── SIDEBAR ───────────────────────────────────────────── */
+.sidebar {
+  width: var(--sidebar-w); background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  position: fixed; top: 0; left: 0; height: 100vh;
+  overflow-y: auto; z-index: 100;
+}
+.sb-header { padding: 1.25rem 1rem 1rem; border-bottom: 1px solid var(--border-soft); }
+.sb-brand { display: flex; align-items: center; gap: 9px; margin-bottom: 1rem; }
+.sb-brand .bicon {
+  width: 32px; height: 32px; border-radius: 8px; background: var(--primary);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.sb-brand .bicon i { font-size: 17px; color: #fff; }
+.sb-brand .bname { font-size: 14px; font-weight: 600; color: var(--text-1); }
+.sb-user { display: flex; align-items: center; gap: 9px; }
+.sb-avatar {
+  width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+  background: var(--primary-light); display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600; color: var(--primary);
+}
+.sb-uname { font-size: 13px; font-weight: 600; color: var(--text-1); }
+.sb-urole { font-size: 11px; color: var(--text-2); }
+.sb-nav { padding: .5rem 0; flex: 1; }
+.nav-section {
+  padding: .75rem 1rem .3rem; font-size: 10px; font-weight: 700;
+  letter-spacing: .07em; text-transform: uppercase; color: var(--text-3);
+}
+.nav-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 1rem; font-size: 13px; font-weight: 500; color: var(--text-2);
+  cursor: pointer; border-left: 2px solid transparent; transition: all .15s;
+  user-select: none;
+}
+.nav-item i { font-size: 18px; flex-shrink: 0; }
+.nav-item:hover { color: var(--text-1); background: var(--bg); }
+.nav-item.active { color: var(--primary); border-left-color: var(--primary); background: var(--primary-light); font-weight: 600; }
+.sb-footer { padding: .75rem 1rem; border-top: 1px solid var(--border-soft); }
+.btn-logout {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 500; color: var(--text-2);
+  cursor: pointer; background: none; border: none; width: 100%; padding: 6px 0;
+  transition: color .15s;
+}
+.btn-logout:hover { color: var(--danger); }
+.btn-logout i { font-size: 18px; }
+
+/* ─── CONTENT ────────────────────────────────────────────── */
+.main-content {
+  margin-left: var(--sidebar-w); flex: 1; padding: 2rem;
+  max-width: calc(100vw - var(--sidebar-w));
+}
+.page { display: none; }
+.page.active { display: block; animation: fadeIn .2s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.page-header { margin-bottom: 1.5rem; }
+.page-title { font-size: 20px; font-weight: 700; color: var(--text-1); }
+.page-sub   { font-size: 13px; color: var(--text-2); margin-top: 3px; }
+
+/* ─── STAT CARDS ────────────────────────────────────────── */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 1.5rem; }
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 1rem 1.1rem;
+  box-shadow: var(--shadow-sm);
+}
+.stat-card .sc-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--text-3); margin-bottom: 6px; }
+.stat-card .sc-val   { font-size: 24px; font-weight: 700; color: var(--text-1); line-height: 1; }
+.stat-card .sc-diff  { font-size: 11px; margin-top: 4px; color: var(--text-2); }
+.stat-card .sc-diff.good  { color: var(--success); }
+.stat-card .sc-diff.warn  { color: var(--danger); }
+
+/* ─── CARD ───────────────────────────────────────────────── */
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
+  overflow: hidden; margin-bottom: 1.25rem;
+}
+.card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: .9rem 1.25rem; border-bottom: 1px solid var(--border-soft);
+}
+.card-header .ch-title { font-size: 14px; font-weight: 600; color: var(--text-1); }
+.card-body { padding: 1rem 1.25rem; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th {
+  padding: 9px 1rem; text-align: left; font-size: 11px; font-weight: 700;
+  letter-spacing: .05em; text-transform: uppercase; color: var(--text-3);
+  background: var(--bg); border-bottom: 1px solid var(--border);
+}
+td { padding: 10px 1rem; border-bottom: 1px solid var(--border-soft); color: var(--text-1); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--bg); }
+
+/* ─── EVENTS ─────────────────────────────────────────────── */
+.event-list { display: flex; flex-direction: column; gap: 8px; }
+.event-item {
+  display: flex; align-items: flex-start; gap: 12px; padding: .85rem 1rem;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-md); border-left-width: 3px;
+  box-shadow: var(--shadow-sm);
+}
+.event-item i.ev-icon { font-size: 20px; margin-top: 1px; flex-shrink: 0; }
+.event-item .ev-title { font-size: 13px; font-weight: 600; color: var(--text-1); }
+.event-item .ev-date  { font-size: 11px; color: var(--text-2); margin-top: 2px; }
+.ev-blue   { border-left-color: var(--primary); } .ev-blue   i.ev-icon { color: var(--primary); }
+.ev-red    { border-left-color: var(--danger);  } .ev-red    i.ev-icon { color: var(--danger);  }
+.ev-green  { border-left-color: var(--success); } .ev-green  i.ev-icon { color: var(--success); }
+.ev-amber  { border-left-color: var(--accent);  } .ev-amber  i.ev-icon { color: var(--accent);  }
+
+/* ─── AVISOS ─────────────────────────────────────────────── */
+.aviso-item {
+  padding: .9rem 1rem; background: var(--bg);
+  border-radius: var(--radius-md); margin-bottom: 8px;
+}
+.aviso-item:last-child { margin-bottom: 0; }
+.aviso-title { font-size: 13px; font-weight: 600; color: var(--text-1); }
+.aviso-body  { font-size: 12px; color: var(--text-2); margin-top: 3px; line-height: 1.6; }
+.aviso-meta  { font-size: 11px; color: var(--text-3); margin-top: 5px; }
+
+/* ─── HORÁRIOS ───────────────────────────────────────────── */
+.schedule-wrap { overflow-x: auto; }
+.schedule-grid {
+  display: grid; grid-template-columns: 90px repeat(5, 1fr);
+  border-radius: var(--radius-lg); overflow: hidden;
+  border: 1px solid var(--border); min-width: 600px;
+}
+.sc-cell {
+  padding: 9px 8px; font-size: 11px; text-align: center;
+  border-right: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border-soft);
+}
+.sc-cell:nth-child(6n) { border-right: none; }
+.sc-cell.sc-header { background: var(--bg); font-weight: 700; font-size: 12px; color: var(--text-2); letter-spacing: .03em; }
+.sc-cell.sc-time   { background: var(--bg); font-weight: 600; color: var(--text-3); font-size: 10px; white-space: nowrap; }
+.sc-cell.sc-break  { background: var(--bg); color: var(--text-3); font-style: italic; grid-column: span 5; }
+.sc-cell.sc-aula   { font-weight: 600; line-height: 1.3; }
+.aula-mat  { background: #eff6ff; color: #1e40af; }
+.aula-port { background: #fdf4ff; color: #6b21a8; }
+.aula-hist { background: #fff7ed; color: #9a3412; }
+.aula-geo  { background: #ecfdf5; color: #065f46; }
+.aula-bio  { background: #f0fdf4; color: #14532d; }
+.aula-fis  { background: #fefce8; color: #713f12; }
+.aula-qui  { background: #fff1f2; color: #881337; }
+.aula-ed   { background: #f0f9ff; color: #0c4a6e; }
+.aula-fil  { background: #fdf2f8; color: #831843; }
+.aula-ing  { background: #f5f3ff; color: #3730a3; }
+.aula-art  { background: #fff7ed; color: #92400e; }
+.aula-cie  { background: #dcfce7; color: #14532d; }
+.legend-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: .75rem; }
+
+/* ─── MATERIAIS ──────────────────────────────────────────── */
+.upload-zone {
+  border: 2px dashed var(--border); border-radius: var(--radius-md);
+  padding: 1.5rem; text-align: center; cursor: pointer; margin-bottom: 1.25rem;
+  color: var(--text-2); font-size: 13px; transition: border-color .15s, background .15s;
+}
+.upload-zone:hover { border-color: var(--primary); background: var(--primary-light); }
+.upload-zone i { font-size: 30px; display: block; margin-bottom: 6px; color: var(--text-3); }
+.upload-zone span { font-weight: 500; }
+.mat-list { display: flex; flex-direction: column; gap: 8px; }
+.mat-item {
+  display: flex; align-items: center; gap: 12px; padding: .85rem 1rem;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
+}
+.mat-icon { width: 38px; height: 38px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.mat-icon i { font-size: 20px; }
+.mi-pdf { background: #fee2e2; } .mi-pdf i { color: #dc2626; }
+.mi-doc { background: #dbeafe; } .mi-doc i { color: #2563eb; }
+.mi-ppt { background: #ffedd5; } .mi-ppt i { color: #ea580c; }
+.mi-zip { background: #f3f4f6; } .mi-zip i { color: #6b7280; }
+.mat-info { flex: 1; min-width: 0; }
+.mat-name { font-size: 13px; font-weight: 600; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mat-meta { font-size: 11px; color: var(--text-2); margin-top: 2px; }
+.btn-dl {
+  display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--surface); font-size: 12px; font-weight: 500;
+  cursor: pointer; color: var(--text-2); transition: all .15s; white-space: nowrap;
+}
+.btn-dl:hover { background: var(--bg); border-color: var(--primary); color: var(--primary); }
+.btn-dl i { font-size: 14px; }
+
+/* ─── RESUMOS ────────────────────────────────────────────── */
+.resumo-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 1rem 1.1rem;
+  box-shadow: var(--shadow-sm); margin-bottom: 10px;
+}
+.resumo-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; }
+.resumo-titulo { font-size: 14px; font-weight: 600; color: var(--text-1); }
+.resumo-meta   { font-size: 11px; color: var(--text-2); margin-top: 3px; display: flex; align-items: center; gap: 6px; }
+.resumo-body   { font-size: 13px; color: var(--text-2); line-height: 1.65; border-top: 1px solid var(--border-soft); padding-top: 10px; margin-top: 8px; }
+.btn-like {
+  display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px;
+  border: 1px solid var(--border); border-radius: 20px;
+  background: var(--surface); font-size: 12px; font-weight: 500;
+  cursor: pointer; color: var(--text-2); transition: all .15s; white-space: nowrap;
+}
+.btn-like:hover { border-color: #f43f5e; color: #f43f5e; }
+.btn-like.liked { background: #fff1f2; border-color: #f43f5e; color: #f43f5e; }
+.btn-like i { font-size: 14px; }
+
+/* ─── PROVAS ─────────────────────────────────────────────── */
+.prova-item {
+  display: flex; align-items: center; gap: 14px; padding: .9rem 1rem;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-md); box-shadow: var(--shadow-sm); margin-bottom: 8px;
+}
+.prova-date {
+  min-width: 54px; text-align: center; background: var(--bg);
+  border-radius: var(--radius-sm); padding: 7px 5px; border: 1px solid var(--border);
+}
+.prova-date .pd-day { font-size: 22px; font-weight: 700; color: var(--text-1); line-height: 1; }
+.prova-date .pd-mon { font-size: 10px; color: var(--text-2); text-transform: uppercase; letter-spacing: .05em; margin-top: 2px; }
+.prova-info { flex: 1; }
+.prova-disc { font-size: 14px; font-weight: 600; color: var(--text-1); }
+.prova-det  { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+.dias-badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; white-space: nowrap; }
+.db-urgente { background: var(--danger-light); color: #991b1b; }
+.db-atencao { background: var(--warning-light); color: var(--warning-text); }
+.db-ok      { background: var(--success-light); color: #166534; }
+
+/* ─── CALENDÁRIO ─────────────────────────────────────────── */
+.cal-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+@media (max-width: 700px) { .cal-layout { grid-template-columns: 1fr; } }
+.cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.cal-nav span { font-size: 14px; font-weight: 600; color: var(--text-1); }
+.cal-nav button { background: none; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 4px 8px; cursor: pointer; color: var(--text-2); font-size: 13px; }
+.cal-nav button:hover { background: var(--bg); }
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; }
+.cal-dn { font-size: 10px; font-weight: 700; color: var(--text-3); text-align: center; padding: 4px 0; text-transform: uppercase; letter-spacing: .04em; }
+.cal-d {
+  aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-sm); font-size: 12px; font-weight: 500;
+  cursor: pointer; color: var(--text-1); position: relative; transition: background .12s;
+}
+.cal-d:hover { background: var(--bg); }
+.cal-d.other  { color: var(--text-3); }
+.cal-d.today  { background: var(--primary); color: #fff; font-weight: 700; }
+.cal-d.today:hover { background: var(--primary-hover); }
+.cal-d .dot   { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); }
+.cal-d.today .dot { background: rgba(255,255,255,.8); }
+
+/* ─── FORMS ──────────────────────────────────────────────── */
+.form-row { display: grid; gap: 10px; margin-bottom: 10px; }
+.form-row-2 { grid-template-columns: 1fr 1fr; }
+.form-row-1 { grid-template-columns: 1fr; }
+.form-row-3 { grid-template-columns: 1fr 1fr 1fr; }
+.inp {
+  padding: 8px 11px; font-size: 13px; font-family: inherit;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--surface); color: var(--text-1); width: 100%;
+  transition: border-color .15s, box-shadow .15s;
+}
+.inp:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26,86,219,.08); }
+textarea.inp { resize: vertical; line-height: 1.6; }
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 7px; padding: 8px 18px;
+  background: var(--primary); color: #fff; border: none; border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 600; cursor: pointer; transition: background .15s;
+}
+.btn-primary:hover { background: var(--primary-hover); }
+.btn-primary i { font-size: 16px; }
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 7px; padding: 8px 16px;
+  background: var(--surface); color: var(--text-1); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; transition: all .15s;
+}
+.btn-secondary:hover { background: var(--bg); }
+.btn-danger {
+  display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px;
+  background: none; color: var(--danger); border: 1px solid var(--danger);
+  border-radius: var(--radius-sm); font-size: 12px; font-weight: 500; cursor: pointer; transition: all .15s;
+}
+.btn-danger:hover { background: var(--danger-light); }
+.btn-success {
+  display: inline-flex; align-items: center; gap: 7px; padding: 8px 18px;
+  background: var(--success); color: #fff; border: none; border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity .15s;
+}
+.btn-success:hover { opacity: .9; }
+
+/* ─── ADMIN / PAINEL ─────────────────────────────────────── */
+.admin-alert {
+  display: flex; align-items: center; gap: 10px; padding: .85rem 1rem;
+  background: var(--primary-light); border: 1px solid #bfdbfe;
+  border-radius: var(--radius-md); font-size: 13px; color: #1e40af; margin-bottom: 1.25rem;
+}
+.admin-alert i { font-size: 18px; flex-shrink: 0; }
+.section-title {
+  font-size: 13px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .05em; color: var(--text-2); margin: 1.5rem 0 .75rem;
+  padding-bottom: .5rem; border-bottom: 1px solid var(--border-soft);
+}
+.member-avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; background: var(--primary-light); color: var(--primary);
+  margin-right: 8px; vertical-align: middle;
+}
+.action-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ─── LIDERANÇA (aba da sala) ────────────────────────────── */
+.lideranca-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 1.5rem;
+}
+.lider-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 1.5rem; text-align: center;
+  box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
+}
+.lider-card.lider-principal { border-top: 3px solid var(--role-lider); }
+.lider-card.lider-vice      { border-top: 3px solid var(--role-vice); }
+.lider-avatar {
+  width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 700;
+}
+.lider-principal .lider-avatar { background: var(--role-lider-bg); color: var(--role-lider); }
+.lider-vice .lider-avatar      { background: var(--role-vice-bg); color: var(--role-vice); }
+.lider-nome { font-size: 16px; font-weight: 700; color: var(--text-1); }
+.lider-cargo { font-size: 12px; color: var(--text-2); margin-top: 4px; }
+.lider-badge { display: inline-flex; align-items: center; gap: 5px; margin-top: 10px; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.lider-principal .lider-badge { background: var(--role-lider-bg); color: var(--role-lider); }
+.lider-vice .lider-badge { background: var(--role-vice-bg); color: var(--role-vice); }
+
+/* ─── CRÉDITOS ───────────────────────────────────────────── */
+.credits-wrap { max-width: 640px; }
+.credits-hero {
+  background: linear-gradient(135deg, #1a56db 0%, #7c3aed 100%);
+  border-radius: var(--radius-lg); padding: 2rem; color: #fff; margin-bottom: 1.5rem;
+  text-align: center;
+}
+.credits-hero h2 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+.credits-hero p  { font-size: 13px; opacity: .85; }
+.credits-section { margin-bottom: 1.5rem; }
+.credits-section h3 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--text-3); margin-bottom: .75rem; padding-bottom: .5rem; border-bottom: 1px solid var(--border-soft); }
+.credits-person {
+  display: flex; align-items: center; gap: 12px; padding: .75rem 1rem;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
+  margin-bottom: 8px; box-shadow: var(--shadow-sm);
+}
+.credits-avatar {
+  width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700;
+}
+.credits-name  { font-size: 14px; font-weight: 600; color: var(--text-1); }
+.credits-role  { font-size: 11px; color: var(--text-2); margin-top: 2px; }
+.credits-version { text-align: center; color: var(--text-3); font-size: 12px; padding: 1rem 0; }
+
+/* ─── CRIAR CONTA (somente dev) ──────────────────────────── */
+.criar-conta-form .form-group { margin-bottom: 1rem; }
+.criar-conta-form label { display: block; font-size: 12px; font-weight: 600; color: var(--text-2); margin-bottom: 5px; text-transform: uppercase; letter-spacing: .04em; }
+
+/* ─── CARGO BADGES ───────────────────────────────────────── */
+.cargo-dev   { background: var(--role-dev-bg);   color: var(--role-dev);   }
+.cargo-lider { background: var(--role-lider-bg); color: var(--role-lider); }
+.cargo-ajuda { background: var(--role-ajuda-bg); color: var(--role-ajuda); }
+.cargo-vice  { background: var(--role-vice-bg);  color: var(--role-vice);  }
+.cargo-aluno { background: var(--role-aluno-bg); color: var(--role-aluno); }
+
+/* ─── ACTIVE FILTER ─────────────────────────────────────── */
+.active-filter { background: var(--primary) !important; color: #fff !important; border-color: var(--primary) !important; }
+
+/* ─── TEMA DARK ──────────────────────────────────────────── */
+body.dark {
+  --primary:        #4f8ef7;
+  --primary-hover:  #6ba3f9;
+  --primary-light:  #1a2744;
+  --accent:         #f59e0b;
+  --danger:         #f87171;
+  --danger-light:   #3b1212;
+  --success:        #34d399;
+  --success-light:  #052e16;
+  --warning-light:  #2d1f00;
+  --warning-text:   #fbbf24;
+  --bg:             #0d0d0d;
+  --surface:        #161616;
+  --surface-2:      #1f1f1f;
+  --border:         #2a2a2a;
+  --border-soft:    #1f1f1f;
+  --text-1:         #f1f1f1;
+  --text-2:         #a1a1aa;
+  --text-3:         #52525b;
+  --shadow-sm:      0 1px 3px rgba(0,0,0,.4), 0 1px 2px rgba(0,0,0,.3);
+  --shadow-md:      0 4px 16px rgba(0,0,0,.5);
+  --role-dev-bg:    #2e1b4e;
+  --role-lider-bg:  #172448;
+  --role-ajuda-bg:  #0c2a33;
+  --role-vice-bg:   #2e1b4e;
+  --role-aluno-bg:  #1c1c1c;
+}
+body.dark .sc-cell.sc-aula.aula-mat { background:#162244; color:#93c5fd; }
+body.dark .sc-cell.sc-aula.aula-port { background:#2a1040; color:#d8b4fe; }
+body.dark .sc-cell.sc-aula.aula-hist { background:#2a1500; color:#fdba74; }
+body.dark .sc-cell.sc-aula.aula-geo  { background:#052e1a; color:#6ee7b7; }
+body.dark .sc-cell.sc-aula.aula-cie  { background:#052e1a; color:#86efac; }
+body.dark .sc-cell.sc-aula.aula-fis  { background:#2a1f00; color:#fde68a; }
+body.dark .sc-cell.sc-aula.aula-qui  { background:#3b0a0a; color:#fca5a5; }
+body.dark .sc-cell.sc-aula.aula-ed   { background:#0c2233; color:#7dd3fc; }
+body.dark .sc-cell.sc-aula.aula-art  { background:#2a1500; color:#fed7aa; }
+body.dark .sc-cell.sc-aula.aula-ing  { background:#1e1040; color:#c4b5fd; }
+body.dark .login-card { background:#161616; border-color:#2a2a2a; }
+body.dark .demo-chip  { background:#1a1a1a; border-color:#2a2a2a; }
+body.dark .demo-chip:hover { background:#1a2744; border-color:#4f8ef7; }
+body.dark .credits-hero { background: linear-gradient(135deg,#1a2744 0%,#2e1b4e 100%); }
+body.dark .tag-blue   { background:#172448; color:#93c5fd; }
+body.dark .tag-purple { background:#2e1b4e; color:#d8b4fe; }
+body.dark .tag-amber  { background:#2a1f00; color:#fde68a; }
+body.dark .tag-red    { background:#3b0a0a; color:#fca5a5; }
+body.dark .tag-green  { background:#052e1a; color:#6ee7b7; }
+body.dark .tag-gray   { background:#1c1c1c; color:#a1a1aa; }
+body.dark .tag-orange { background:#2a1500; color:#fdba74; }
+body.dark .tag-teal   { background:#0c2a33; color:#5eead4; }
+body.dark .tag-pink   { background:#2d0a1a; color:#f9a8d4; }
+body.dark .tag-sky    { background:#0c2233; color:#7dd3fc; }
+body.dark .tag-cyan   { background:#0c2a33; color:#67e8f9; }
+body.dark .tag-violet { background:#2e1b4e; color:#c4b5fd; }
+body.dark .cargo-dev   { background:#2e1b4e; color:#c4b5fd; }
+body.dark .cargo-lider { background:#172448; color:#93c5fd; }
+body.dark .cargo-ajuda { background:#0c2a33; color:#67e8f9; }
+body.dark .cargo-vice  { background:#2e1b4e; color:#c4b5fd; }
+body.dark .cargo-aluno { background:#1c1c1c; color:#a1a1aa; }
+body.dark .active-filter { background:var(--primary) !important; color:#fff !important; border-color:var(--primary) !important; }
+body.dark .aula-mat,.dark .aula-port,.dark .aula-hist,.dark .aula-geo,.dark .aula-bio,.dark .aula-fis,
+body.dark .aula-qui,.dark .aula-ed,.dark .aula-fil,.dark .aula-ing,.dark .aula-art,.dark .aula-cie { color: inherit; }
+
+/* ─── CONFIGURAÇÕES ──────────────────────────────────────── */
+.config-section { margin-bottom: 2rem; }
+.config-section h3 {
+  font-size: 13px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .05em; color: var(--text-2); margin-bottom: .75rem;
+  padding-bottom: .5rem; border-bottom: 1px solid var(--border-soft);
+}
+.config-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: .9rem 1rem; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-md); margin-bottom: 8px; box-shadow: var(--shadow-sm);
+}
+.config-row-info .cr-label { font-size: 13px; font-weight: 600; color: var(--text-1); }
+.config-row-info .cr-desc  { font-size: 11px; color: var(--text-2); margin-top: 2px; }
+/* Toggle switch */
+.toggle-wrap { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+.toggle-wrap input { opacity: 0; width: 0; height: 0; position: absolute; }
+.toggle-track {
+  position: absolute; inset: 0; border-radius: 12px;
+  background: var(--border); cursor: pointer; transition: background .2s;
+}
+.toggle-track::after {
+  content: ''; position: absolute; top: 3px; left: 3px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: #fff; transition: transform .2s; box-shadow: 0 1px 3px rgba(0,0,0,.2);
+}
+.toggle-wrap input:checked + .toggle-track { background: var(--primary); }
+.toggle-wrap input:checked + .toggle-track::after { transform: translateX(20px); }
+
+/* ─── SPINNER ────────────────────────────────────────────── */
+.spinner {
+  width: 18px; height: 18px; border: 2px solid rgba(255,255,255,.3);
+  border-top-color: #fff; border-radius: 50%; animation: spin .6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-overlay {
+  position: fixed; inset: 0; background: rgba(255,255,255,.7);
+  display: flex; align-items: center; justify-content: center; z-index: 200;
+}
+.loading-overlay.hidden { display: none; }
+</style>
+</head>
+<body>
+
+<div id="toast"></div>
+<div class="loading-overlay hidden" id="loading"><div class="spinner" style="border-color:rgba(26,86,219,.2);border-top-color:var(--primary);width:36px;height:36px;border-width:3px"></div></div>
+
+<!-- ═══════════════════════════════════════
+     LOGIN
+════════════════════════════════════════ -->
+<div id="login-screen">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-brand">
+        <div class="brand-icon"><i class="ti ti-school"></i></div>
+        <div>
+          <div class="brand-name">Central da Turma</div>
+          <div class="brand-sub">7º Ano — Ensino Fundamental</div>
+        </div>
+      </div>
+      <div class="login-title">Fazer login</div>
+      <div class="login-desc">Entre com seu usuário e senha para acessar</div>
+      <div class="form-field">
+        <label>Usuário</label>
+        <input type="text" id="inp-user" placeholder="seu.usuario" autocomplete="username" />
+      </div>
+      <div class="form-field">
+        <label>Senha</label>
+        <input type="password" id="inp-pass" placeholder="••••••••" autocomplete="current-password"
+               onkeydown="if(event.key==='Enter') doLogin()" />
+      </div>
+      <div class="login-err hidden" id="login-err"></div>
+      <button class="btn-login" id="login-btn" onclick="doLogin()">
+        <i class="ti ti-login"></i> Entrar
+      </button>
+      <div class="login-info">Não tem conta? Fale com o Desenvolvedor da turma no instagram @wtf_elicas.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     MAIN APP
+════════════════════════════════════════ -->
+<div id="app">
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sb-header">
+        <div class="sb-brand">
+          <div class="bicon"><i class="ti ti-school"></i></div>
+          <div class="bname">Central da Turma</div>
+        </div>
+        <div class="sb-user">
+          <div class="sb-avatar" id="sb-avatar">--</div>
+          <div>
+            <div class="sb-uname" id="sb-name">Carregando...</div>
+            <div class="sb-urole" id="sb-role">—</div>
+          </div>
+        </div>
+      </div>
+
+      <nav class="sb-nav">
+        <div class="nav-section">Estudos</div>
+        <div class="nav-item active" onclick="navTo('inicio',this)"><i class="ti ti-home"></i> Início</div>
+        <div class="nav-item" onclick="navTo('horarios',this)"><i class="ti ti-clock"></i> Horários</div>
+        <div class="nav-item" onclick="navTo('materiais',this)"><i class="ti ti-files"></i> Materiais</div>
+        <div class="nav-item" onclick="navTo('resumos',this)"><i class="ti ti-notes"></i> Resumos</div>
+        <div class="nav-item" onclick="navTo('provas',this)"><i class="ti ti-writing"></i> Provas</div>
+        <div class="nav-item" onclick="navTo('calendario',this)"><i class="ti ti-calendar"></i> Calendário</div>
+        <div class="nav-section">Turma</div>
+        <div class="nav-item" onclick="navTo('lideranca',this)"><i class="ti ti-shield-star"></i> Liderança</div>
+        <div class="nav-item" onclick="navTo('creditos',this)"><i class="ti ti-award"></i> Créditos</div>
+        <div class="nav-section hidden" id="nav-admin-section">Administração</div>
+        <div class="nav-item hidden" id="nav-admin" onclick="navTo('admin',this)"><i class="ti ti-settings-2"></i> Painel Admin</div>
+        <div class="nav-item hidden" id="nav-criar-conta" onclick="navTo('criar-conta',this)"><i class="ti ti-user-plus"></i> Criar conta</div>
+        <div class="nav-section">Conta</div>
+        <div class="nav-item" onclick="navTo('configuracoes',this)"><i class="ti ti-adjustments-horizontal"></i> Configurações</div>
+      </nav>
+
+      <div class="sb-footer">
+        <button class="btn-logout" onclick="doLogout()"><i class="ti ti-logout"></i> Sair da conta</button>
+      </div>
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="main-content">
+
+      <!-- ── INÍCIO ──────────────────────────── -->
+      <div class="page active" id="page-inicio">
+        <div class="page-header">
+          <div class="page-title" id="welcome-msg">Olá! 👋</div>
+          <div class="page-sub">7º Ano — Ensino Fundamental</div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="sc-label">Próxima prova</div>
+            <div class="sc-val" style="font-size:16px;margin-top:4px" id="stat-prova">—</div>
+            <div class="sc-diff warn" id="stat-prova-dias">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="sc-label">Materiais</div>
+            <div class="sc-val" id="stat-materiais">—</div>
+            <div class="sc-diff good" id="stat-mat-novos">carregando...</div>
+          </div>
+          <div class="stat-card">
+            <div class="sc-label">Resumos</div>
+            <div class="sc-val" id="stat-resumos">—</div>
+            <div class="sc-diff">compartilhados</div>
+          </div>
+          <div class="stat-card">
+            <div class="sc-label">Alunos</div>
+            <div class="sc-val" id="stat-alunos">—</div>
+            <div class="sc-diff">na turma</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="ch-title">Próximos eventos</span></div>
+          <div class="card-body">
+            <div class="event-list" id="eventos-list">
+              <div style="color:var(--text-3);font-size:13px">Carregando eventos...</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="ch-title">Avisos da turma</span>
+            <button class="btn-primary hidden" id="btn-novo-aviso" onclick="navTo('admin', document.getElementById('nav-admin'))">
+              <i class="ti ti-plus"></i> Novo aviso
+            </button>
+          </div>
+          <div class="card-body" id="avisos-list">
+            <div style="color:var(--text-3);font-size:13px">Carregando avisos...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── HORÁRIOS ────────────────────────── -->
+      <div class="page" id="page-horarios">
+        <div class="page-header">
+          <div class="page-title">Horários das aulas</div>
+          <div class="page-sub">Grade semanal — 7º Ano · 2026</div>
+        </div>
+        <div class="card">
+          <div class="card-body" style="padding:1rem">
+            <div class="schedule-wrap">
+              <div class="schedule-grid" id="schedule-grid">
+                <div class="sc-cell sc-header">Horário</div>
+                <div class="sc-cell sc-header">Segunda</div>
+                <div class="sc-cell sc-header">Terça</div>
+                <div class="sc-cell sc-header">Quarta</div>
+                <div class="sc-cell sc-header">Quinta</div>
+                <div class="sc-cell sc-header">Sexta</div>
+                <div class="sc-cell sc-time">7h00–7h50</div>
+                <div class="sc-cell sc-aula aula-mat">Matemática</div>
+                <div class="sc-cell sc-aula aula-port">Português</div>
+                <div class="sc-cell sc-aula aula-cie">Ciências</div>
+                <div class="sc-cell sc-aula aula-hist">História</div>
+                <div class="sc-cell sc-aula aula-geo">Geografia</div>
+                <div class="sc-cell sc-time">7h50–8h40</div>
+                <div class="sc-cell sc-aula aula-port">Português</div>
+                <div class="sc-cell sc-aula aula-ing">Inglês</div>
+                <div class="sc-cell sc-aula aula-mat">Matemática</div>
+                <div class="sc-cell sc-aula aula-cie">Ciências</div>
+                <div class="sc-cell sc-aula aula-ed">Ed. Física</div>
+                <div class="sc-cell sc-time">8h40–9h30</div>
+                <div class="sc-cell sc-aula aula-hist">História</div>
+                <div class="sc-cell sc-aula aula-mat">Matemática</div>
+                <div class="sc-cell sc-aula aula-geo">Geografia</div>
+                <div class="sc-cell sc-aula aula-port">Português</div>
+                <div class="sc-cell sc-aula aula-art">Artes</div>
+                <div class="sc-cell sc-time">9h30–9h50</div>
+                <div class="sc-cell sc-break">— intervalo —</div>
+                <div class="sc-cell sc-time">9h50–10h40</div>
+                <div class="sc-cell sc-aula aula-geo">Geografia</div>
+                <div class="sc-cell sc-aula aula-cie">Ciências</div>
+                <div class="sc-cell sc-aula aula-port">Português</div>
+                <div class="sc-cell sc-aula aula-mat">Matemática</div>
+                <div class="sc-cell sc-aula aula-hist">História</div>
+                <div class="sc-cell sc-time">10h40–11h30</div>
+                <div class="sc-cell sc-aula aula-ed">Ed. Física</div>
+                <div class="sc-cell sc-aula aula-art">Artes</div>
+                <div class="sc-cell sc-aula aula-ing">Inglês</div>
+                <div class="sc-cell sc-aula aula-geo">Geografia</div>
+                <div class="sc-cell sc-aula aula-mat">Matemática</div>
+              </div>
+            </div>
+            <div class="legend-chips">
+              <span class="tag tag-blue">Matemática</span>
+              <span class="tag tag-purple">Português</span>
+              <span class="tag tag-green">Ciências</span>
+              <span class="tag tag-orange">História</span>
+              <span class="tag tag-teal">Geografia</span>
+              <span class="tag tag-sky">Ed. Física</span>
+              <span class="tag tag-amber">Artes</span>
+              <span class="tag" style="background:#f5f3ff;color:#3730a3">Inglês</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── MATERIAIS ───────────────────────── -->
+      <div class="page" id="page-materiais">
+        <div class="page-header">
+          <div class="page-title">Materiais e atividades</div>
+          <div class="page-sub">Baixe trabalhos, atividades e materiais das aulas</div>
+        </div>
+        <div class="upload-zone hidden" id="upload-zone" onclick="triggerUpload()">
+          <i class="ti ti-cloud-upload"></i>
+          <span>Arraste um arquivo ou clique para enviar</span>
+          <div style="font-size:12px;color:var(--text-3);margin-top:4px">PDF, DOC, DOCX, PPT, PPTX · máx 50 MB</div>
+        </div>
+        <input type="file" id="file-input" style="display:none" onchange="uploadFile(this)" />
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem" id="mat-filters">
+          <button class="btn-secondary active-filter" onclick="filtrarMat('', this)" style="font-size:12px;padding:5px 12px">Todos</button>
+          <button class="btn-secondary" onclick="filtrarMat('Matemática', this)" style="font-size:12px;padding:5px 12px">Matemática</button>
+          <button class="btn-secondary" onclick="filtrarMat('Ciências', this)" style="font-size:12px;padding:5px 12px">Ciências</button>
+          <button class="btn-secondary" onclick="filtrarMat('História', this)" style="font-size:12px;padding:5px 12px">História</button>
+          <button class="btn-secondary" onclick="filtrarMat('Português', this)" style="font-size:12px;padding:5px 12px">Português</button>
+        </div>
+        <div class="mat-list" id="mat-list">
+          <div style="color:var(--text-3);font-size:13px">Carregando materiais...</div>
+        </div>
+      </div>
+
+      <!-- ── RESUMOS ─────────────────────────── -->
+      <div class="page" id="page-resumos">
+        <div class="page-header">
+          <div class="page-title">Resumos da turma</div>
+          <div class="page-sub">Compartilhe e acesse resumos feitos pelos colegas</div>
+        </div>
+        <div class="card hidden" id="form-resumo">
+          <div class="card-header"><span class="ch-title">Compartilhar resumo</span></div>
+          <div class="card-body">
+            <div class="form-row form-row-2">
+              <input class="inp" id="r-titulo" placeholder="Título do resumo" />
+              <input class="inp" id="r-disc" placeholder="Disciplina" />
+            </div>
+            <div class="form-row form-row-1">
+              <textarea class="inp" id="r-txt" rows="4" placeholder="Escreva o resumo aqui..."></textarea>
+            </div>
+            <button class="btn-primary" onclick="publicarResumo()"><i class="ti ti-send"></i> Publicar</button>
+          </div>
+        </div>
+        <div id="resumos-list">
+          <div style="color:var(--text-3);font-size:13px">Carregando resumos...</div>
+        </div>
+      </div>
+
+      <!-- ── PROVAS ──────────────────────────── -->
+      <div class="page" id="page-provas">
+        <div class="page-header">
+          <div class="page-title">Datas de provas</div>
+          <div class="page-sub">Calendário de avaliações — 7º Ano</div>
+        </div>
+        <div class="card hidden" id="form-prova">
+          <div class="card-header"><span class="ch-title">Adicionar prova / avaliação</span></div>
+          <div class="card-body">
+            <div class="form-row form-row-3">
+              <input class="inp" id="p-disc" placeholder="Disciplina" />
+              <input class="inp" id="p-data" placeholder="Data (DD/MM)" />
+              <input class="inp" id="p-hora" placeholder="Horário (ex: 1º período)" />
+            </div>
+            <div class="form-row form-row-1">
+              <input class="inp" id="p-cont" placeholder="Conteúdo da prova" />
+            </div>
+            <button class="btn-primary" onclick="adicionarProva()"><i class="ti ti-plus"></i> Adicionar</button>
+          </div>
+        </div>
+        <div id="provas-list">
+          <div style="color:var(--text-3);font-size:13px">Carregando provas...</div>
+        </div>
+      </div>
+
+      <!-- ── CALENDÁRIO ──────────────────────── -->
+      <div class="page" id="page-calendario">
+        <div class="page-header">
+          <div class="page-title">Calendário escolar</div>
+          <div class="page-sub" id="cal-titulo">Junho de 2026</div>
+        </div>
+        <div class="cal-layout">
+          <div class="card" style="padding:1rem">
+            <div class="cal-nav">
+              <button onclick="mudaMes(-1)"><i class="ti ti-chevron-left"></i></button>
+              <span id="cal-mes-label">Junho 2026</span>
+              <button onclick="mudaMes(1)"><i class="ti ti-chevron-right"></i></button>
+            </div>
+            <div class="cal-grid" id="cal-grid"></div>
+          </div>
+          <div>
+            <div style="font-size:14px;font-weight:600;color:var(--text-1);margin-bottom:.75rem">Eventos do mês</div>
+            <div class="event-list" id="cal-eventos-list">
+              <div style="color:var(--text-3);font-size:13px">Carregando...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── LIDERANÇA DA SALA ───────────────── -->
+      <div class="page" id="page-lideranca">
+        <div class="page-header">
+          <div class="page-title">Liderança da Sala</div>
+          <div class="page-sub">7º Ano — representantes eleitos da turma</div>
+        </div>
+        <div class="lideranca-grid" id="lideranca-cards">
+          <div style="color:var(--text-3);font-size:13px">Carregando...</div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="ch-title">Todos os membros da turma</span></div>
+          <table>
+            <thead><tr><th>Aluno</th><th>Cargo</th></tr></thead>
+            <tbody id="lideranca-tbody">
+              <tr><td colspan="2" style="color:var(--text-3)">Carregando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── CRÉDITOS ────────────────────────── -->
+      <div class="page" id="page-creditos">
+        <div class="page-header">
+          <div class="page-title">Créditos</div>
+          <div class="page-sub">Quem fez e mantém a Central da Turma</div>
+        </div>
+        <div class="credits-wrap">
+          <div class="credits-hero">
+            <h2>Central da Turma</h2>
+            <p>Sistema de organização e comunicação do 7º Ano · Versão 2.0</p>
+          </div>
+          <div class="credits-section">
+            <h3>Desenvolvimento</h3>
+            <div id="credits-devs"></div>
+          </div>
+          <div class="credits-section">
+            <h3>Liderança da turma</h3>
+            <div id="credits-lideres"></div>
+          </div>
+          <div class="credits-section">
+            <h3>Ajudante de desenvolvimento</h3>
+            <div id="credits-ajuda"></div>
+          </div>
+          <div class="credits-version">Central da Turma v2.0 · 7º Ano · 2026</div>
+        </div>
+      </div>
+
+      <!-- ── ADMIN ───────────────────────────── -->
+      <div class="page" id="page-admin">
+        <div class="page-header">
+          <div class="page-title">Painel de administração</div>
+          <div class="page-sub" id="admin-role-desc">—</div>
+        </div>
+        <div class="admin-alert">
+          <i class="ti ti-info-circle"></i>
+          <span id="admin-alert-txt">Você tem acesso de edição. Alterações são salvas no banco em tempo real.</span>
+        </div>
+
+        <div class="section-title">Ações rápidas</div>
+        <div class="action-btns">
+          <button class="btn-primary" onclick="navTo('materiais',null);document.getElementById('upload-zone').classList.remove('hidden')">
+            <i class="ti ti-upload"></i> Enviar material
+          </button>
+          <button class="btn-primary" style="background:#7c3aed" onclick="navTo('provas',null);document.getElementById('form-prova').classList.remove('hidden')">
+            <i class="ti ti-calendar-plus"></i> Adicionar prova
+          </button>
+          <button class="btn-success" onclick="document.getElementById('form-aviso').classList.toggle('hidden')">
+            <i class="ti ti-speakerphone"></i> Novo aviso
+          </button>
+          <button class="btn-secondary" onclick="navTo('resumos',null);document.getElementById('form-resumo').classList.remove('hidden')">
+            <i class="ti ti-notes"></i> Novo resumo
+          </button>
+        </div>
+
+        <!-- FORM AVISO -->
+        <div class="card hidden" id="form-aviso" style="margin-top:1rem">
+          <div class="card-header"><span class="ch-title">Publicar aviso</span></div>
+          <div class="card-body">
+            <div class="form-row form-row-2">
+              <input class="inp" id="a-titulo" placeholder="Título do aviso" />
+              <select class="inp" id="a-tipo">
+                <option value="geral">📌 Aviso geral</option>
+                <option value="lembrete">📎 Entrega / trabalho</option>
+                <option value="urgente">🔴 Urgente</option>
+              </select>
+            </div>
+            <div class="form-row form-row-1">
+              <textarea class="inp" id="a-body" rows="3" placeholder="Texto do aviso..."></textarea>
+            </div>
+            <button class="btn-primary" onclick="publicarAviso()"><i class="ti ti-send"></i> Publicar</button>
+          </div>
+        </div>
+
+        <!-- FORM EVENTO -->
+        <div class="card" style="margin-top:1rem">
+          <div class="card-header"><span class="ch-title">Adicionar evento ao calendário</span></div>
+          <div class="card-body">
+            <div class="form-row form-row-3">
+              <input class="inp" id="ev-titulo" placeholder="Nome do evento" />
+              <input class="inp" id="ev-data" placeholder="Data (DD/MM)" />
+              <select class="inp" id="ev-tipo">
+                <option value="escolar">🏫 Escolar</option>
+                <option value="entrega">📎 Entrega</option>
+                <option value="social">🎉 Social</option>
+                <option value="outro">📅 Outro</option>
+              </select>
+            </div>
+            <div class="form-row form-row-1">
+              <input class="inp" id="ev-desc" placeholder="Descrição (ex: 18h · Auditório)" />
+            </div>
+            <button class="btn-primary" onclick="adicionarEvento()"><i class="ti ti-plus"></i> Adicionar evento</button>
+          </div>
+        </div>
+
+        <!-- MEMBROS -->
+        <div class="section-title">Gerenciar membros</div>
+        <div class="card">
+          <table>
+            <thead><tr><th>Aluno</th><th>Cargo</th><th>Ação</th></tr></thead>
+            <tbody id="membros-tbody">
+              <tr><td colspan="3" style="color:var(--text-3)">Carregando membros...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- STATS -->
+        <div class="section-title">Estatísticas da turma</div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="sc-label">Materiais</div><div class="sc-val" id="adm-stat-mat">—</div></div>
+          <div class="stat-card"><div class="sc-label">Resumos</div><div class="sc-val" id="adm-stat-res">—</div></div>
+          <div class="stat-card"><div class="sc-label">Provas</div><div class="sc-val" id="adm-stat-prov">—</div></div>
+          <div class="stat-card"><div class="sc-label">Avisos</div><div class="sc-val" id="adm-stat-avis">—</div></div>
+        </div>
+      </div>
+
+      <!-- ── CRIAR CONTA (somente dev) ─────────── -->
+      <div class="page" id="page-criar-conta">
+        <div class="page-header">
+          <div class="page-title">Criar nova conta</div>
+          <div class="page-sub">Somente o Desenvolvedor pode criar contas</div>
+        </div>
+        <div class="card" style="max-width:480px">
+          <div class="card-header"><span class="ch-title">Dados do novo usuário</span></div>
+          <div class="card-body criar-conta-form">
+            <div class="form-row form-row-2">
+              <div>
+                <label style="display:block;font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em">Nome completo</label>
+                <input class="inp" id="nc-nome" placeholder="Ex: Ana Souza" />
+              </div>
+              <div>
+                <label style="display:block;font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em">Usuário</label>
+                <input class="inp" id="nc-usuario" placeholder="Ex: ana.souza" />
+              </div>
+            </div>
+            <div class="form-row form-row-2">
+              <div>
+                <label style="display:block;font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em">Senha</label>
+                <input class="inp" type="password" id="nc-senha" placeholder="Mínimo 6 caracteres" />
+              </div>
+              <div>
+                <label style="display:block;font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em">Cargo</label>
+                <select class="inp" id="nc-role">
+                  <option value="aluno">Aluno</option>
+                  <option value="sub_lider">Vice-líder da Sala</option>
+                  <option value="lider">Líder da Sala</option>
+                  <option value="ajudante_dev">Ajudante de Desenvolvimento</option>
+                  <option value="dev">Desenvolvedor</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn-primary" onclick="criarConta()"><i class="ti ti-user-plus"></i> Criar conta</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CONFIGURAÇÕES ───────────────────── -->
+      <div class="page" id="page-configuracoes">
+        <div class="page-header">
+          <div class="page-title">Configurações</div>
+          <div class="page-sub">Preferências visuais salvas no seu navegador</div>
+        </div>
+
+        <div class="config-section">
+          <h3>Aparência</h3>
+
+          <div class="config-row">
+            <div class="config-row-info">
+              <div class="cr-label">Tema escuro</div>
+              <div class="cr-desc">Fundo preto, menos cansativo para os olhos à noite</div>
+            </div>
+            <label class="toggle-wrap">
+              <input type="checkbox" id="toggle-dark" onchange="toggleDark(this.checked)" />
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="config-section">
+          <h3>Conta</h3>
+          <div class="config-row">
+            <div class="config-row-info">
+              <div class="cr-label" id="cfg-nome">—</div>
+              <div class="cr-desc" id="cfg-usuario">—</div>
+            </div>
+            <span class="tag" id="cfg-cargo">—</span>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════ -->
+<script>
+/* ── CONFIG ──────────────────────────────────────────────── */
+const BASE_URL = 'http://localhost:3000';
+
+let token = sessionStorage.getItem('ct_token') || null;
+let currentUser = null;
+
+/* ── Hierarquia de cargos (maior número = mais permissão) ── */
+const NIVEL_CARGO = {
+  aluno:         1,
+  sub_lider:     2,   // Vice-líder
+  lider:         3,   // Líder da Sala
+  ajudante_dev:  4,   // Ajudante de Desenvolvimento
+  dev:           5,   // Desenvolvedor
+};
+
+const NOME_CARGO = {
+  dev:           'Desenvolvedor',
+  ajudante_dev:  'Ajudante de Desenvolvimento',
+  lider:         'Líder da Sala',
+  sub_lider:     'Vice-líder da Sala',
+  aluno:         'Aluno',
+};
+
+const TAG_CARGO = {
+  dev:           'cargo-dev',
+  ajudante_dev:  'cargo-ajuda',
+  lider:         'cargo-lider',
+  sub_lider:     'cargo-vice',
+  aluno:         'cargo-aluno',
+};
+
+function nivelUsuario() {
+  return NIVEL_CARGO[currentUser?.role] || 0;
+}
+
+// Vice-líder pra cima pode editar
+function podeEditar() { return nivelUsuario() >= 2; }
+// Líder pra cima pode gerenciar membros
+function podeLiderar() { return nivelUsuario() >= 3; }
+// Só dev cria contas
+function isDev() { return currentUser?.role === 'dev'; }
+
+/* ── API helpers ────────────────────────────────────────── */
+async function apiFetch(endpoint, opts = {}) {
+  const headers = { 'Content-Type': 'application/json', ...opts.headers };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  const res = await fetch(BASE_URL + endpoint, { ...opts, headers });
+  if (res.status === 401) { doLogout(); throw new Error('Sessão expirada'); }
+  if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.message || 'Erro na requisição'); }
+  return res.json();
+}
+const apiGet  = ep       => apiFetch(ep);
+const apiPost = (ep, b)  => apiFetch(ep, { method: 'POST',   body: JSON.stringify(b) });
+const apiPut  = (ep, b)  => apiFetch(ep, { method: 'PUT',    body: JSON.stringify(b) });
+const apiDel  = ep       => apiFetch(ep, { method: 'DELETE' });
+
+/* ── Toast ──────────────────────────────────────────────── */
+function toast(msg, type = 'default') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.background = type === 'error' ? '#ef4444' : type === 'success' ? '#10b981' : '#1f2937';
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+/* ── Init ───────────────────────────────────────────────── */
+window.addEventListener('DOMContentLoaded', () => {
+  aplicarTema();
+  if (token) {
+    apiGet('/auth/me')
+      .then(user => { currentUser = user; initApp(); })
+      .catch(() => { token = null; sessionStorage.removeItem('ct_token'); });
+  }
+  renderCalendario();
+});
+
+/* ── AUTH ───────────────────────────────────────────────── */
+async function doLogin() {
+  const usuario = document.getElementById('inp-user').value.trim();
+  const senha   = document.getElementById('inp-pass').value;
+  const err     = document.getElementById('login-err');
+  err.classList.add('hidden');
+  if (!usuario || !senha) { err.textContent = 'Preencha usuário e senha.'; err.classList.remove('hidden'); return; }
+  const btn = document.getElementById('login-btn');
+  btn.innerHTML = '<div class="spinner"></div>'; btn.disabled = true;
+  try {
+    const data = await apiPost('/auth/login', { usuario, senha });
+    token = data.token;
+    sessionStorage.setItem('ct_token', token);
+    currentUser = data.user;
+    initApp();
+  } catch (e) {
+    err.textContent = e.message || 'Usuário ou senha incorretos.';
+    err.classList.remove('hidden');
+  } finally {
+    btn.innerHTML = '<i class="ti ti-login"></i> Entrar'; btn.disabled = false;
+  }
+}
+
+function doLogout() {
+  token = null; currentUser = null;
+  sessionStorage.removeItem('ct_token');
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('inp-user').value = '';
+  document.getElementById('inp-pass').value = '';
+}
+
+/* ── INIT APP ───────────────────────────────────────────── */
+function initApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+
+  const first = currentUser.nome.split(' ')[0];
+  document.getElementById('sb-name').textContent = currentUser.nome;
+  document.getElementById('sb-avatar').textContent = currentUser.iniciais || iniciais(currentUser.nome);
+  document.getElementById('welcome-msg').textContent = `Olá, ${first}! 👋`;
+
+  const nomeCargo = NOME_CARGO[currentUser.role] || currentUser.role;
+  document.getElementById('sb-role').textContent = nomeCargo;
+  document.getElementById('admin-role-desc').textContent = nomeCargo;
+
+  // Avatar cor por cargo
+  const avatarColors = { dev:'#7c3aed', ajudante_dev:'#0891b2', lider:'#1a56db', sub_lider:'#6d28d9', aluno:'#374151' };
+  const avatarBgs    = { dev:'#ede9fe', ajudante_dev:'#cffafe', lider:'#dbeafe', sub_lider:'#ede9fe', aluno:'#f3f4f6' };
+  const sbAv = document.getElementById('sb-avatar');
+  sbAv.style.background = avatarBgs[currentUser.role] || '#eff6ff';
+  sbAv.style.color = avatarColors[currentUser.role] || '#1a56db';
+
+  // Nav: admin aparece para vice-lider pra cima
+  const showAdmin = podeEditar();
+  document.getElementById('nav-admin-section').classList.toggle('hidden', !showAdmin);
+  document.getElementById('nav-admin').classList.toggle('hidden', !showAdmin);
+  document.getElementById('btn-novo-aviso').classList.toggle('hidden', !showAdmin);
+  document.getElementById('nav-criar-conta').classList.toggle('hidden', !isDev());
+
+  // Elementos de edição aparecem para quem pode editar
+  if (podeEditar()) {
+    document.getElementById('upload-zone').classList.remove('hidden');
+    document.getElementById('form-resumo').classList.remove('hidden');
+    document.getElementById('form-prova').classList.remove('hidden');
+  }
+
+  navTo('inicio', document.querySelector('.nav-item'));
+  carregarDados();
+}
+
+function iniciais(nome) {
+  return nome.split(' ').slice(0,2).map(n=>n[0]).join('').toUpperCase();
+}
+
+/* ── TEMA DARK ──────────────────────────────────────────── */
+function aplicarTema() {
+  const dark = localStorage.getItem('ct_dark') === '1';
+  document.body.classList.toggle('dark', dark);
+  const toggle = document.getElementById('toggle-dark');
+  if (toggle) toggle.checked = dark;
+}
+
+function toggleDark(ativo) {
+  localStorage.setItem('ct_dark', ativo ? '1' : '0');
+  document.body.classList.toggle('dark', ativo);
+  toast(ativo ? 'Tema escuro ativado' : 'Tema claro ativado', 'default');
+}
+
+// Aplica antes do DOMContentLoaded para evitar flash
+aplicarTema();
+
+/* ── NAVEGAÇÃO ──────────────────────────────────────────── */
+function navTo(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const pg = document.getElementById('page-' + id);
+  if (pg) pg.classList.add('active');
+  if (el) el.classList.add('active');
+  // carrega dados específicos da aba
+  if (id === 'lideranca') carregarLideranca();
+  if (id === 'creditos')  carregarCreditos();
+  if (id === 'configuracoes') abrirConfiguracoes();
+}
+
+/* ── CONFIGURAÇÕES ──────────────────────────────────────── */
+function abrirConfiguracoes() {
+  aplicarTema(); // sincroniza toggle com estado atual
+  if (!currentUser) return;
+  document.getElementById('cfg-nome').textContent    = currentUser.nome;
+  document.getElementById('cfg-usuario').textContent = '@' + currentUser.usuario + ' · ' + (currentUser.turma_nome || '7º Ano');
+  const cfgCargo = document.getElementById('cfg-cargo');
+  cfgCargo.textContent  = NOME_CARGO[currentUser.role] || currentUser.role;
+  cfgCargo.className    = 'tag ' + (TAG_CARGO[currentUser.role] || 'cargo-aluno');
+}
+
+/* ── CARREGAMENTO GERAL ─────────────────────────────────── */
+async function carregarDados() {
+  await Promise.allSettled([
+    carregarEventos(), carregarAvisos(), carregarMateriais(),
+    carregarResumos(), carregarProvas(), carregarMembros(),
+  ]);
+}
+
+/* ── EVENTOS ─────────────────────────────────────────────── */
+async function carregarEventos() {
+  try {
+    const eventos = await apiGet('/eventos');
+    renderEventos(eventos, 'eventos-list');
+    renderEventos(eventos, 'cal-eventos-list');
+  } catch(e) { console.error('Eventos:', e); }
+}
+
+const evClasse = { prova:'ev-red', entrega:'ev-amber', evento:'ev-blue', simulado:'ev-green' };
+const evIcone  = { prova:'ti-writing', entrega:'ti-pencil', evento:'ti-calendar-event', simulado:'ti-writing' };
+
+function renderEventos(list, elId) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  if (!list.length) { el.innerHTML = '<div style="color:var(--text-3);font-size:13px">Sem eventos próximos.</div>'; return; }
+  el.innerHTML = list.map(ev => `
+    <div class="event-item ${evClasse[ev.tipo]||'ev-blue'}">
+      <i class="ti ${evIcone[ev.tipo]||'ti-calendar'} ev-icon"></i>
+      <div>
+        <div class="ev-title">${ev.titulo}</div>
+        <div class="ev-date">${formatData(ev.data)}${ev.descricao ? ' · ' + ev.descricao : ''}</div>
+      </div>
+      ${podeEditar() ? `<button class="btn-danger" style="margin-left:auto" onclick="deletarEvento(${ev.id})"><i class="ti ti-trash"></i></button>` : ''}
+    </div>`).join('');
+}
+
+async function adicionarEvento() {
+  const titulo = document.getElementById('ev-titulo').value.trim();
+  const data   = document.getElementById('ev-data').value.trim();
+  const tipo   = document.getElementById('ev-tipo').value;
+  const desc   = document.getElementById('ev-desc').value.trim();
+  if (!titulo || !data) { toast('Preencha título e data.', 'error'); return; }
+  const [dia, mes] = data.split('/');
+  const isoData = `2026-${mes.padStart(2,'0')}-${dia.padStart(2,'0')}`;
+  try {
+    await apiPost('/eventos', { titulo, data: isoData, tipo, descricao: desc });
+    toast('Evento adicionado!', 'success');
+    document.getElementById('ev-titulo').value = '';
+    document.getElementById('ev-data').value = '';
+    document.getElementById('ev-desc').value = '';
+    await carregarEventos();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function deletarEvento(id) {
+  if (!confirm('Remover este evento?')) return;
+  try {
+    await apiDel(`/eventos/${id}`);
+    toast('Evento removido.', 'success');
+    await carregarEventos();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+/* ── AVISOS ──────────────────────────────────────────────── */
+async function carregarAvisos() {
+  try {
+    const avisos = await apiGet('/avisos');
+    const canDelete = podeEditar();
+    document.getElementById('avisos-list').innerHTML = avisos.length
+      ? avisos.map(a => `
+          <div class="aviso-item">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div class="aviso-title">${a.titulo}</div>
+              ${canDelete ? `<button class="btn-danger" style="margin-left:8px;flex-shrink:0" onclick="deletarAviso(${a.id})"><i class="ti ti-trash"></i></button>` : ''}
+            </div>
+            <div class="aviso-body">${a.corpo}</div>
+            <div class="aviso-meta">${a.autor} · ${formatData(a.criadoEm)}</div>
+          </div>`).join('')
+      : '<div style="color:var(--text-3);font-size:13px">Nenhum aviso no momento.</div>';
+    document.getElementById('adm-stat-avis').textContent = avisos.length;
+  } catch(e) { console.error('Avisos:', e); }
+}
+
+async function publicarAviso() {
+  const titulo = document.getElementById('a-titulo').value.trim();
+  const corpo  = document.getElementById('a-body').value.trim();
+  const tipo   = document.getElementById('a-tipo').value;
+  if (!titulo || !corpo) { toast('Preencha título e texto.', 'error'); return; }
+  try {
+    await apiPost('/avisos', { titulo, corpo, tipo });
+    toast('Aviso publicado!', 'success');
+    document.getElementById('a-titulo').value = '';
+    document.getElementById('a-body').value = '';
+    document.getElementById('form-aviso').classList.add('hidden');
+    await carregarAvisos();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function deletarAviso(id) {
+  if (!confirm('Remover este aviso?')) return;
+  try {
+    await apiDel(`/avisos/${id}`);
+    toast('Aviso removido.', 'success');
+    await carregarAvisos();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+/* ── MATERIAIS ───────────────────────────────────────────── */
+let todosOsMateriais = [];
+
+async function carregarMateriais() {
+  try {
+    const data = await apiGet('/materiais');
+    todosOsMateriais = data;
+    renderMateriais(data);
+    document.getElementById('stat-materiais').textContent = data.length;
+    document.getElementById('adm-stat-mat').textContent = data.length;
+    document.getElementById('stat-mat-novos').textContent = `+${data.filter(m => diasDesde(m.criadoEm) <= 7).length} novos esta semana`;
+  } catch(e) { console.error('Materiais:', e); }
+}
+
+function renderMateriais(list) {
+  const el = document.getElementById('mat-list');
+  if (!list.length) { el.innerHTML = '<div style="color:var(--text-3);font-size:13px">Nenhum material encontrado.</div>'; return; }
+  el.innerHTML = list.map(m => {
+    const tamanho = m.tamanho ? (m.tamanho > 1048576 ? (m.tamanho/1048576).toFixed(1)+' MB' : Math.round(m.tamanho/1024)+' KB') : '—';
+    const url = m.url ? BASE_URL + m.url : '#';
+    return `
+    <div class="mat-item">
+      <div class="mat-icon mi-${m.tipo}"><i class="ti ${tipoIcon(m.tipo)}"></i></div>
+      <div class="mat-info">
+        <div class="mat-name">${m.nome}</div>
+        <div class="mat-meta">${m.tipo.toUpperCase()} · ${tamanho} · enviado por ${m.enviadoPor||'—'} · ${formatData(m.criadoEm)}</div>
+      </div>
+      <span class="tag ${discTag(m.disciplina)}" style="margin-right:8px;white-space:nowrap">${m.disciplina}</span>
+      <a href="${url}" target="_blank" class="btn-dl"><i class="ti ti-download"></i> Baixar</a>
+      ${podeEditar() ? `<button class="btn-danger" onclick="deletarMaterial(${m.id})"><i class="ti ti-trash"></i></button>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function filtrarMat(disc, btn) {
+  document.querySelectorAll('#mat-filters button').forEach(b => b.classList.remove('active-filter'));
+  btn.classList.add('active-filter');
+  renderMateriais(disc ? todosOsMateriais.filter(m => m.disciplina === disc) : todosOsMateriais);
+}
+
+function triggerUpload() { document.getElementById('file-input').click(); }
+
+async function uploadFile(input) {
+  const file = input.files[0]; if (!file) return;
+  const disciplina = prompt('Qual a disciplina deste material?') || 'Geral';
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('disciplina', disciplina);
+  formData.append('nome', file.name.replace(/\.[^.]+$/, ''));
+  try {
+    const res = await fetch(BASE_URL + '/materiais', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData
+    });
+    if (!res.ok) { const err = await res.json().catch(()=>({})); throw new Error(err.message || 'Falha ao enviar'); }
+    toast('Material enviado!', 'success');
+    await carregarMateriais();
+  } catch(e) { toast(e.message, 'error'); }
+  input.value = '';
+}
+
+async function deletarMaterial(id) {
+  if (!confirm('Remover este material?')) return;
+  try {
+    await apiDel(`/materiais/${id}`);
+    toast('Material removido.', 'success');
+    await carregarMateriais();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+/* ── RESUMOS ─────────────────────────────────────────────── */
+async function carregarResumos() {
+  try {
+    const data = await apiGet('/resumos');
+    const el = document.getElementById('resumos-list');
+    el.innerHTML = data.length ? data.map(r => `
+      <div class="resumo-card" id="resumo-${r.id}">
+        <div class="resumo-head">
+          <div>
+            <div class="resumo-titulo">${r.titulo}</div>
+            <div class="resumo-meta">
+              ${r.autorNome} · ${formatData(r.criadoEm)}
+              <span class="tag ${discTag(r.disciplina)}">${r.disciplina}</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <button class="btn-like ${r.curtido ? 'liked' : ''}" onclick="curtirResumo(${r.id}, this)">
+              <i class="ti ti-heart"></i> <span>${r.curtidas}</span>
+            </button>
+            ${podeEditar() ? `<button class="btn-danger" onclick="deletarResumo(${r.id})"><i class="ti ti-trash"></i></button>` : ''}
+          </div>
+        </div>
+        <div class="resumo-body">${r.corpo}</div>
+      </div>`).join('') : '<div style="color:var(--text-3);font-size:13px">Nenhum resumo ainda.</div>';
+    document.getElementById('stat-resumos').textContent = data.length;
+    document.getElementById('adm-stat-res').textContent = data.length;
+  } catch(e) { console.error('Resumos:', e); }
+}
+
+async function publicarResumo() {
+  const titulo = document.getElementById('r-titulo').value.trim();
+  const disc   = document.getElementById('r-disc').value.trim();
+  const corpo  = document.getElementById('r-txt').value.trim();
+  if (!titulo || !corpo) { toast('Preencha título e texto.', 'error'); return; }
+  try {
+    await apiPost('/resumos', { titulo, disciplina: disc, corpo });
+    toast('Resumo publicado!', 'success');
+    document.getElementById('r-titulo').value = '';
+    document.getElementById('r-disc').value = '';
+    document.getElementById('r-txt').value = '';
+    await carregarResumos();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function curtirResumo(id, btn) {
+  try {
+    const res = await apiPost(`/resumos/${id}/curtir`);
+    const n = parseInt(btn.querySelector('span').textContent);
+    if (res.curtido) { btn.classList.add('liked'); btn.querySelector('span').textContent = n + 1; }
+    else             { btn.classList.remove('liked'); btn.querySelector('span').textContent = n - 1; }
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function deletarResumo(id) {
+  if (!confirm('Remover este resumo?')) return;
+  try {
+    await apiDel(`/resumos/${id}`);
+    toast('Resumo removido.', 'success');
+    await carregarResumos();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+/* ── PROVAS ──────────────────────────────────────────────── */
+async function carregarProvas() {
+  try {
+    const data = await apiGet('/provas');
+    const el = document.getElementById('provas-list');
+    el.innerHTML = data.map(p => {
+      const dias = diasAte(p.data);
+      const cls = dias <= 7 ? 'db-urgente' : dias <= 14 ? 'db-atencao' : 'db-ok';
+      const partes = p.data.split('-');
+      const diaNum = partes[2]; const mesNum = parseInt(partes[1]);
+      const meses = ['','jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+      return `
+        <div class="prova-item" id="prova-${p.id}">
+          <div class="prova-date">
+            <div class="pd-day">${diaNum}</div>
+            <div class="pd-mon">${meses[mesNum]}</div>
+          </div>
+          <div class="prova-info">
+            <div class="prova-disc">${p.disciplina}</div>
+            <div class="prova-det">${p.conteudo}${p.horario ? ' · ' + p.horario : ''}</div>
+          </div>
+          <span class="dias-badge ${cls}">${dias <= 0 ? 'hoje!' : dias + ' dias'}</span>
+          ${podeEditar() ? `<button class="btn-danger" style="margin-left:8px" onclick="deletarProva(${p.id})"><i class="ti ti-trash"></i></button>` : ''}
+        </div>`;
+    }).join('');
+    document.getElementById('adm-stat-prov').textContent = data.length;
+    const prox = [...data].sort((a,b) => new Date(a.data)-new Date(b.data))[0];
+    if (prox) {
+      document.getElementById('stat-prova').textContent = prox.disciplina + ' · ' + formatDataCurta(prox.data);
+      const d = diasAte(prox.data);
+      document.getElementById('stat-prova-dias').textContent = d <= 0 ? 'hoje!' : d + ' dias';
+    }
+  } catch(e) { console.error('Provas:', e); }
+}
+
+async function adicionarProva() {
+  const disc = document.getElementById('p-disc').value.trim();
+  const data = document.getElementById('p-data').value.trim();
+  const hora = document.getElementById('p-hora').value.trim();
+  const cont = document.getElementById('p-cont').value.trim();
+  if (!disc || !data) { toast('Preencha disciplina e data.', 'error'); return; }
+  const [dia, mes] = data.split('/');
+  const isoData = `2026-${mes.padStart(2,'0')}-${dia.padStart(2,'0')}`;
+  try {
+    await apiPost('/provas', { disciplina:disc, data:isoData, horario:hora, conteudo:cont });
+    toast('Prova adicionada!', 'success');
+    document.getElementById('p-disc').value = '';
+    document.getElementById('p-data').value = '';
+    document.getElementById('p-hora').value = '';
+    document.getElementById('p-cont').value = '';
+    await carregarProvas();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function deletarProva(id) {
+  if (!confirm('Remover esta prova?')) return;
+  try {
+    await apiDel(`/provas/${id}`);
+    toast('Prova removida.', 'success');
+    await carregarProvas();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+/* ── MEMBROS (painel admin) ─────────────────────────────── */
+async function carregarMembros() {
+  try {
+    const data = await apiGet('/membros');
+    const tbody = document.getElementById('membros-tbody');
+    tbody.innerHTML = data.map(m => `
+      <tr>
+        <td>
+          <span class="member-avatar">${iniciais(m.nome)}</span>
+          ${m.nome} <span style="color:var(--text-3);font-size:11px">(${m.usuario})</span>
+        </td>
+        <td><span class="tag ${TAG_CARGO[m.role]||'cargo-aluno'}">${NOME_CARGO[m.role]||m.role}</span></td>
+        <td>
+          ${podeLiderar() && m.id !== currentUser?.id
+            ? `<button class="btn-danger" onclick="removerMembro(${m.id})"><i class="ti ti-trash"></i> Remover</button>`
+            : '<span style="color:var(--text-3);font-size:12px">—</span>'}
+        </td>
+      </tr>`).join('');
+    document.getElementById('stat-alunos').textContent = data.length;
+  } catch(e) { console.error('Membros:', e); }
+}
+
+async function removerMembro(id) {
+  if (!confirm('Remover este membro?')) return;
+  try {
+    await apiDel(`/membros/${id}`);
+    toast('Membro removido.', 'success');
+    await carregarMembros();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+/* ── LIDERANÇA DA SALA ──────────────────────────────────── */
+async function carregarLideranca() {
+  try {
+    const data = await apiGet('/membros');
+
+    const lider = data.find(m => m.role === 'lider');
+    const vice  = data.find(m => m.role === 'sub_lider');
+
+    const cards = document.getElementById('lideranca-cards');
+    cards.innerHTML = '';
+
+    if (lider) cards.innerHTML += `
+      <div class="lider-card lider-principal">
+        <div class="lider-avatar">${iniciais(lider.nome)}</div>
+        <div class="lider-nome">${lider.nome}</div>
+        <div class="lider-cargo">@${lider.usuario}</div>
+        <div class="lider-badge"><i class="ti ti-shield-star" style="font-size:14px"></i> Líder da Sala</div>
+      </div>`;
+
+    if (vice) cards.innerHTML += `
+      <div class="lider-card lider-vice">
+        <div class="lider-avatar">${iniciais(vice.nome)}</div>
+        <div class="lider-nome">${vice.nome}</div>
+        <div class="lider-cargo">@${vice.usuario}</div>
+        <div class="lider-badge"><i class="ti ti-shield-half" style="font-size:14px"></i> Vice-líder da Sala</div>
+      </div>`;
+
+    if (!lider && !vice) cards.innerHTML = '<div style="color:var(--text-3);font-size:13px">Nenhum líder definido ainda.</div>';
+
+    // Tabela com todos
+    const tbody = document.getElementById('lideranca-tbody');
+    tbody.innerHTML = data.map(m => `
+      <tr>
+        <td>
+          <span class="member-avatar">${iniciais(m.nome)}</span>
+          ${m.nome}
+        </td>
+        <td><span class="tag ${TAG_CARGO[m.role]||'cargo-aluno'}">${NOME_CARGO[m.role]||m.role}</span></td>
+      </tr>`).join('');
+  } catch(e) { console.error('Liderança:', e); }
+}
+
+/* ── CRÉDITOS ────────────────────────────────────────────── */
+async function carregarCreditos() {
+  try {
+    const data = await apiGet('/membros');
+
+    const avatarColors = { dev:'#7c3aed', ajudante_dev:'#0891b2', lider:'#1a56db', sub_lider:'#6d28d9', aluno:'#374151' };
+    const avatarBgs    = { dev:'#ede9fe', ajudante_dev:'#cffafe', lider:'#dbeafe', sub_lider:'#ede9fe', aluno:'#f3f4f6' };
+
+    function creditCard(m) {
+      return `<div class="credits-person">
+        <div class="credits-avatar" style="background:${avatarBgs[m.role]||'#eff6ff'};color:${avatarColors[m.role]||'#1a56db'}">${iniciais(m.nome)}</div>
+        <div>
+          <div class="credits-name">${m.nome}</div>
+          <div class="credits-role">${NOME_CARGO[m.role]||m.role}</div>
+        </div>
+        <span class="tag ${TAG_CARGO[m.role]||'cargo-aluno'}" style="margin-left:auto">${NOME_CARGO[m.role]||m.role}</span>
+      </div>`;
+    }
+
+    const devs   = data.filter(m => m.role === 'dev');
+    const lideres = data.filter(m => m.role === 'lider' || m.role === 'sub_lider');
+    const ajuda  = data.filter(m => m.role === 'ajudante_dev');
+
+    document.getElementById('credits-devs').innerHTML   = devs.length   ? devs.map(creditCard).join('')   : '<div style="color:var(--text-3);font-size:13px">—</div>';
+    document.getElementById('credits-lideres').innerHTML = lideres.length ? lideres.map(creditCard).join('') : '<div style="color:var(--text-3);font-size:13px">—</div>';
+    document.getElementById('credits-ajuda').innerHTML  = ajuda.length  ? ajuda.map(creditCard).join('')  : '<div style="color:var(--text-3);font-size:13px">—</div>';
+  } catch(e) { console.error('Créditos:', e); }
+}
+
+/* ── CRIAR CONTA (somente dev) ──────────────────────────── */
+async function criarConta() {
+  if (!isDev()) { toast('Apenas o Desenvolvedor pode criar contas.', 'error'); return; }
+  const nome    = document.getElementById('nc-nome').value.trim();
+  const usuario = document.getElementById('nc-usuario').value.trim();
+  const senha   = document.getElementById('nc-senha').value;
+  const role    = document.getElementById('nc-role').value;
+  if (!nome || !usuario || !senha) { toast('Preencha todos os campos.', 'error'); return; }
+  if (senha.length < 6) { toast('Senha deve ter ao menos 6 caracteres.', 'error'); return; }
+  try {
+    await apiPost('/auth/criar-conta', { nome, usuario, senha, role });
+    toast(`Conta de ${nome} criada com sucesso!`, 'success');
+    document.getElementById('nc-nome').value = '';
+    document.getElementById('nc-usuario').value = '';
+    document.getElementById('nc-senha').value = '';
+    document.getElementById('nc-role').value = 'aluno';
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+/* ── CALENDÁRIO ──────────────────────────────────────────── */
+let calMes = new Date().getMonth();
+let calAno = new Date().getFullYear();
+const nomesMeses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+function mudaMes(delta) {
+  calMes += delta;
+  if (calMes > 11) { calMes = 0; calAno++; }
+  if (calMes < 0)  { calMes = 11; calAno--; }
+  renderCalendario();
+}
+
+function renderCalendario() {
+  const label = document.getElementById('cal-mes-label');
+  if (label) label.textContent = `${nomesMeses[calMes]} ${calAno}`;
+  const titulo = document.getElementById('cal-titulo');
+  if (titulo) titulo.textContent = `${nomesMeses[calMes]} de ${calAno}`;
+  const grid = document.getElementById('cal-grid');
+  if (!grid) return;
+  const eventDays = [10,12,14,17,20,24];
+  const hoje = new Date();
+  const primeiro = new Date(calAno, calMes, 1).getDay();
+  const total = new Date(calAno, calMes+1, 0).getDate();
+  const dns = ['D','S','T','Q','Q','S','S'];
+  let html = dns.map(d => `<div class="cal-dn">${d}</div>`).join('');
+  for (let i=0; i<primeiro; i++) html += `<div class="cal-d other"></div>`;
+  for (let d=1; d<=total; d++) {
+    const isToday = d === hoje.getDate() && calMes === hoje.getMonth() && calAno === hoje.getFullYear();
+    html += `<div class="cal-d ${isToday?'today':''}">${d}${eventDays.includes(d)?'<div class="dot"></div>':''}</div>`;
+  }
+  grid.innerHTML = html;
+}
+
+/* ── HELPERS ─────────────────────────────────────────────── */
+function formatData(iso) {
+  if (!iso) return '';
+  const [ano,mes,dia] = iso.split('-');
+  const meses = ['','jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  return `${parseInt(dia)} de ${meses[parseInt(mes)]}`;
+}
+function formatDataCurta(iso) {
+  if (!iso) return '';
+  const [,mes,dia] = iso.split('-');
+  return `${dia}/${mes}`;
+}
+function diasAte(iso) {
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  return Math.round((new Date(iso + 'T00:00:00') - hoje) / 86400000);
+}
+function diasDesde(iso) {
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  return Math.round((hoje - new Date(iso + 'T00:00:00')) / 86400000);
+}
+function tipoIcon(tipo) {
+  return tipo === 'pdf' ? 'ti-file-type-pdf' : tipo === 'ppt' ? 'ti-presentation' : 'ti-file-text';
+}
+function discTag(disc) {
+  const map = {
+    'Matemática':'tag-blue','Português':'tag-purple','Ciências':'tag-green',
+    'História':'tag-orange','Geografia':'tag-teal','Ed. Física':'tag-sky',
+    'Artes':'tag-amber','Inglês':'tag-gray'
+  };
+  return map[disc] || 'tag-gray';
+}
+</script>
+</body>
+</html>
