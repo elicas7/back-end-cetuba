@@ -35,7 +35,7 @@ app.use(express.urlencoded({ extended: true }));
 
 
 // ── Frontend ───────────────────────────────────────────
-const frontendDir = path.resolve(__dirname, '../frontend');
+const frontendDir = path.resolve(__dirname, './frontend');
 
 app.use(express.static(frontendDir));
 
