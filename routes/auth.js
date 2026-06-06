@@ -1,4 +1,4 @@
-// backend/routes/auth.js
+// routes/auth.js
 const router = require('express').Router();
 const bcrypt = require('bcryptjs');
 const jwt    = require('jsonwebtoken');
@@ -20,11 +20,19 @@ router.post('/login', async (req, res) => {
     if (!user || !(await bcrypt.compare(senha, user.senha_hash))) {
       return res.status(401).json({ message: 'Usuário ou senha incorretos.' });
     }
+    // Atualiza último login
+    await pool.query(`UPDATE usuarios SET ultimo_login = NOW() WHERE id = $1`, [user.id]);
+
     const payload = { id: user.id, usuario: user.usuario, role: user.role, turma_id: user.turma_id };
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '7d' });
     return res.json({
       token,
-      user: { id: user.id, nome: user.nome, usuario: user.usuario, role: user.role, iniciais: user.iniciais, turma_id: user.turma_id, turma_nome: user.turma_nome },
+      user: {
+        id: user.id, nome: user.nome, usuario: user.usuario,
+        role: user.role, iniciais: user.iniciais,
+        turma_id: user.turma_id, turma_nome: user.turma_nome,
+        avatar_url: user.avatar_url, bio: user.bio,
+      },
     });
   } catch (err) {
     console.error('Login:', err);
@@ -36,7 +44,8 @@ router.post('/login', async (req, res) => {
 router.get('/me', auth, async (req, res) => {
   try {
     const { rows } = await pool.query(
-      `SELECT u.id, u.nome, u.usuario, u.role, u.iniciais, u.turma_id, t.nome AS turma_nome
+      `SELECT u.id, u.nome, u.usuario, u.role, u.iniciais, u.bio, u.avatar_url,
+              u.turma_id, t.nome AS turma_nome, u.ultimo_login AS "ultimoLogin"
          FROM usuarios u LEFT JOIN turmas t ON t.id = u.turma_id WHERE u.id = $1`,
       [req.user.id]
     );
@@ -50,13 +59,11 @@ router.post('/criar-conta', auth, soDev, async (req, res) => {
   const { nome, usuario, senha, role = 'aluno' } = req.body;
   if (!nome || !usuario || !senha) return res.status(400).json({ message: 'Nome, usuário e senha são obrigatórios.' });
   if (senha.length < 6) return res.status(400).json({ message: 'Senha deve ter ao menos 6 caracteres.' });
-
   const rolesValidas = ['aluno', 'sub_lider', 'lider', 'ajudante_dev', 'dev'];
   if (!rolesValidas.includes(role)) return res.status(400).json({ message: 'Cargo inválido.' });
-
   try {
     const senha_hash = await bcrypt.hash(senha, 10);
-    const ini = nome.split(' ').slice(0,2).map(n=>n[0]).join('').toUpperCase();
+    const ini = nome.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase();
     const { rows } = await pool.query(
       `INSERT INTO usuarios (nome, usuario, senha_hash, role, iniciais, turma_id)
        VALUES ($1, $2, $3, $4, $5, $6)
