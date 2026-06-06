@@ -7,9 +7,7 @@ const { auth, podeEditar } = require('../middleware/auth');
 router.get('/', auth, async (req, res) => {
   try {
     const { rows } = await pool.query(
-      `SELECT id, disciplina,
-              TO_CHAR(data, 'YYYY-MM-DD') AS data,
-              TO_CHAR(horario, 'HH24:MI') AS horario,
+      `SELECT id, disciplina, data::text AS data, horario::text AS horario,
               conteudo, criado_em AS "criadoEm"
          FROM provas
         WHERE turma_id = $1
@@ -26,18 +24,13 @@ router.get('/', auth, async (req, res) => {
 // POST /provas
 router.post('/', auth, podeEditar, async (req, res) => {
   const { disciplina, data, horario, conteudo } = req.body;
-  if (!disciplina || !data) {
+  if (!disciplina || !data)
     return res.status(400).json({ message: 'Disciplina e data são obrigatórios.' });
-  }
-
   try {
     const { rows } = await pool.query(
       `INSERT INTO provas (disciplina, data, horario, conteudo, turma_id)
        VALUES ($1, $2, $3, $4, $5)
-       RETURNING id, disciplina,
-                 TO_CHAR(data, 'YYYY-MM-DD') AS data,
-                 TO_CHAR(horario, 'HH24:MI') AS horario,
-                 conteudo`,
+       RETURNING id, disciplina, data::text AS data, horario::text AS horario, conteudo`,
       [disciplina, data, horario || null, conteudo || null, req.user.turma_id]
     );
     return res.status(201).json(rows[0]);
