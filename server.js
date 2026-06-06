@@ -35,8 +35,9 @@ const materiaisRouter = require('./routes/materiais');
 const membrosRouter   = require('./routes/membros');
 const provasRouter    = require('./routes/provas');
 const resumosRouter   = require('./routes/resumos');
-const perfilRouter    = require('./routes/perfil');
-const adminRouter     = require('./routes/admin');
+const perfilRouter        = require('./routes/perfil');
+const adminRouter         = require('./routes/admin');
+const atualizacoesRouter  = require('./routes/atualizacoes');
 
 const register = (prefix, router) => {
   app.use(prefix, router);
@@ -50,8 +51,9 @@ register('/materiais', materiaisRouter);
 register('/membros',   membrosRouter);
 register('/provas',    provasRouter);
 register('/resumos',   resumosRouter);
-register('/perfil',    perfilRouter);
-register('/admin',     adminRouter);
+register('/perfil',        perfilRouter);
+register('/admin',         adminRouter);
+register('/atualizacoes',  atualizacoesRouter);
 
 // ── HEALTH ────────────────────────────────────────────────
 app.get('/health', (req, res) => res.json({ ok: true, ts: new Date() }));
