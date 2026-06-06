@@ -646,12 +646,78 @@ body.dark .aula-qui,.dark .aula-ed,.dark .aula-fil,.dark .aula-ing,.dark .aula-a
 .bug-badge-prio.baixo   { background:#d1fae5; color:#065f46; }
 .bug-status-select { font-size:12px; padding:3px 6px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:var(--text-1); cursor:pointer; }
 .inp-label { display:block; font-size:12px; font-weight:600; color:var(--text-2); text-transform:uppercase; letter-spacing:.04em; margin-bottom:5px; }
+
+/* ─── MOBILE TOPBAR ──────────────────────────────────────── */
+.mobile-topbar {
+  display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 150;
+  height: 52px; background: var(--surface); border-bottom: 1px solid var(--border);
+  align-items: center; padding: 0 1rem; gap: 10px;
+  box-shadow: 0 1px 8px rgba(0,0,0,.12);
+}
+.mobile-topbar .mt-brand { font-size: 15px; font-weight: 600; color: var(--text-1); flex: 1; }
+.btn-hamburger {
+  background: none; border: none; padding: 6px; cursor: pointer;
+  color: var(--text-1); display: flex; align-items: center;
+  border-radius: 6px; transition: background .15s;
+}
+.btn-hamburger:hover { background: var(--bg); }
+.btn-hamburger i { font-size: 22px; }
+.sidebar-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.5); z-index: 99;
+  opacity: 0; transition: opacity .25s; pointer-events: none;
+}
+.sidebar-overlay.visible { opacity: 1; pointer-events: auto; }
+
+/* ─── RESPONSIVE ─────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .mobile-topbar { display: flex; }
+  .sidebar-overlay { display: block; }
+
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform .28s cubic-bezier(.4,0,.2,1);
+    z-index: 200; box-shadow: none;
+  }
+  .sidebar.open {
+    transform: translateX(0);
+    box-shadow: 4px 0 32px rgba(0,0,0,.25);
+  }
+
+  .main-content {
+    margin-left: 0 !important;
+    max-width: 100vw !important;
+    padding: 1rem;
+    padding-top: calc(52px + 1rem);
+    box-sizing: border-box;
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  .card { overflow-x: auto; }
+  table { min-width: 480px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 400px) {
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .page-title { font-size: 17px; }
+}
 </style>
 </head>
 <body>
 
 <div id="toast"></div>
 <div class="loading-overlay hidden" id="loading"><div class="spinner" style="border-color:rgba(26,86,219,.2);border-top-color:var(--primary);width:36px;height:36px;border-width:3px"></div></div>
+
+<!-- overlay + topbar mobile -->
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+<div class="mobile-topbar" id="mobile-topbar">
+  <button class="btn-hamburger" onclick="toggleSidebar()" aria-label="Menu">
+    <i class="ti ti-menu-2" id="hamburger-icon"></i>
+  </button>
+  <div class="mt-brand">Central da Turma</div>
+</div>
 
 <!-- ═══════════════════════════════════════
      LOGIN
@@ -2435,6 +2501,45 @@ async function deletarBug(id) {
     await carregarBugs();
   } catch(e) { toast(e.message, 'error'); }
 }
+
+/* ── SIDEBAR MOBILE ──────────────────────────────────────── */
+function openSidebar() {
+  document.querySelector('.sidebar').classList.add('open');
+  document.getElementById('sidebar-overlay').classList.add('visible');
+  document.getElementById('hamburger-icon').className = 'ti ti-x';
+}
+function closeSidebar() {
+  document.querySelector('.sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('visible');
+  document.getElementById('hamburger-icon').className = 'ti ti-menu-2';
+}
+function toggleSidebar() {
+  document.querySelector('.sidebar').classList.contains('open') ? closeSidebar() : openSidebar();
+}
+
+// Fecha ao clicar em nav item no mobile
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => { if (window.innerWidth <= 768) closeSidebar(); });
+});
+
+// Swipe gesture
+(function() {
+  let startX = 0, startY = 0, active = false;
+  const EDGE = 30, MIN_SWIPE = 50, MAX_VERT = 70;
+  document.addEventListener('touchstart', e => {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    active = startX < EDGE || document.querySelector('.sidebar').classList.contains('open');
+  }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (!active) return;
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = Math.abs(e.changedTouches[0].clientY - startY);
+    if (dy > MAX_VERT || Math.abs(dx) < MIN_SWIPE) return;
+    if (dx > 0) openSidebar(); else closeSidebar();
+    active = false;
+  }, { passive: true });
+})();
 
 function formatData(iso) {
   if (!iso) return '';
