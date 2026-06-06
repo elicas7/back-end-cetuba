@@ -626,6 +626,26 @@ body.dark .aula-qui,.dark .aula-ed,.dark .aula-fil,.dark .aula-ing,.dark .aula-a
 .upd-versao { font-size:11px; color:var(--text-3); background:var(--bg); padding:2px 8px; border-radius:20px; border:1px solid var(--border); }
 .upd-corpo { font-size:13.5px; color:var(--text-2); line-height:1.65; white-space:pre-wrap; }
 .upd-meta  { font-size:11px; color:var(--text-3); margin-top:.75rem; display:flex; align-items:center; gap:6px; }
+/* ── BUG CARDS ────────────────────────────────────────────── */
+.bug-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1rem 1.25rem;
+  margin-bottom: .75rem; border-left: 4px solid var(--border);
+}
+.bug-card.prio-critico { border-left-color: #ef4444; }
+.bug-card.prio-alto    { border-left-color: #f97316; }
+.bug-card.prio-medio   { border-left-color: #f59e0b; }
+.bug-card.prio-baixo   { border-left-color: #10b981; }
+.bug-card.status-resolvido { opacity: .6; }
+.bug-head { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:.5rem; }
+.bug-titulo-text { font-size:14px; font-weight:700; color:var(--text-1); flex:1; }
+.bug-badge-prio  { font-size:11px; font-weight:600; padding:2px 7px; border-radius:20px; }
+.bug-badge-prio.critico { background:#fee2e2; color:#b91c1c; }
+.bug-badge-prio.alto    { background:#ffedd5; color:#c2410c; }
+.bug-badge-prio.medio   { background:#fef3c7; color:#92400e; }
+.bug-badge-prio.baixo   { background:#d1fae5; color:#065f46; }
+.bug-status-select { font-size:12px; padding:3px 6px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:var(--text-1); cursor:pointer; }
+.inp-label { display:block; font-size:12px; font-weight:600; color:var(--text-2); text-transform:uppercase; letter-spacing:.04em; margin-bottom:5px; }
 </style>
 </head>
 <body>
@@ -703,6 +723,8 @@ body.dark .aula-qui,.dark .aula-ed,.dark .aula-fil,.dark .aula-ing,.dark .aula-a
         <div class="nav-section hidden" id="nav-admin-section">Administração</div>
         <div class="nav-item hidden" id="nav-admin" onclick="navTo('admin',this)"><i class="ti ti-settings-2"></i> Painel Admin</div>
         <div class="nav-item hidden" id="nav-criar-conta" onclick="navTo('criar-conta',this)"><i class="ti ti-user-plus"></i> Criar conta</div>
+        <div class="nav-item" id="nav-report-bug" onclick="navTo('report-bug',this)"><i class="ti ti-bug"></i> Reportar bug</div>
+        <div class="nav-item hidden" id="nav-bugs-reportados" onclick="navTo('bugs-reportados',this)"><i class="ti ti-bug-off"></i> Bugs reportados</div>
         <div class="nav-section">Conta</div>
         <div class="nav-item" onclick="navTo('perfil',this)"><i class="ti ti-user-circle"></i> Meu Perfil</div>
         <div class="nav-item" onclick="navTo('configuracoes',this)"><i class="ti ti-adjustments-horizontal"></i> Configurações</div>
@@ -1148,6 +1170,99 @@ body.dark .aula-qui,.dark .aula-ed,.dark .aula-fil,.dark .aula-ing,.dark .aula-a
         </div>
       </div>
 
+      <!-- ── REPORTAR BUG ───────────────────────────────── -->
+      <div class="page" id="page-report-bug">
+        <div class="page-header">
+          <div class="page-title"><i class="ti ti-bug" style="color:#ef4444"></i> Reportar bug</div>
+          <div class="page-sub">Encontrou algo errado? Nos avise!</div>
+        </div>
+        <div class="card" style="max-width:560px">
+          <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
+            <div>
+              <label class="inp-label">Título do bug <span style="color:#ef4444">*</span></label>
+              <input class="inp" id="bug-titulo" placeholder="Ex: Botão de curtir não funciona no celular" maxlength="120" />
+            </div>
+            <div>
+              <label class="inp-label">Em qual página acontece?</label>
+              <select class="inp" id="bug-pagina">
+                <option value="">Não sei / geral</option>
+                <option value="Avisos">Avisos</option>
+                <option value="Resumos">Resumos</option>
+                <option value="Materiais">Materiais</option>
+                <option value="Provas">Provas</option>
+                <option value="Eventos">Eventos</option>
+                <option value="Meu Perfil">Meu Perfil</option>
+                <option value="Liderança">Liderança</option>
+                <option value="Painel Admin">Painel Admin</option>
+                <option value="Últimas Atualizações">Últimas Atualizações</option>
+                <option value="Login">Login</option>
+                <option value="Outro">Outro</option>
+              </select>
+            </div>
+            <div>
+              <label class="inp-label">Prioridade</label>
+              <select class="inp" id="bug-prioridade">
+                <option value="baixo">🟢 Baixo — visual ou detalhe pequeno</option>
+                <option value="medio" selected>🟡 Médio — atrapalha mas dá pra usar</option>
+                <option value="alto">🟠 Alto — dificulta muito o uso</option>
+                <option value="critico">🔴 Crítico — impede de usar o sistema</option>
+              </select>
+            </div>
+            <div>
+              <label class="inp-label">Descrição detalhada <span style="color:#ef4444">*</span></label>
+              <textarea class="inp" id="bug-descricao" rows="4" maxlength="1000"
+                placeholder="Descreva o que aconteceu, o que você esperava, e como reproduzir o bug..."></textarea>
+            </div>
+            <div style="display:flex;justify-content:flex-end">
+              <button class="btn-primary" onclick="reportarBug()" style="background:#ef4444;border-color:#ef4444">
+                <i class="ti ti-send"></i> Enviar report
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- confirmação enviada -->
+        <div id="bug-enviado" class="card hidden" style="max-width:560px;margin-top:1rem;border-left:4px solid #10b981">
+          <div class="card-body" style="display:flex;align-items:center;gap:12px;color:#065f46">
+            <i class="ti ti-circle-check" style="font-size:24px;color:#10b981"></i>
+            <div>
+              <div style="font-weight:700">Bug enviado com sucesso!</div>
+              <div style="font-size:13px;color:var(--text-2)">Nossa equipe vai analisar em breve. Obrigado!</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── BUGS REPORTADOS (dev + ajudante_dev) ──────── -->
+      <div class="page" id="page-bugs-reportados">
+        <div class="page-header">
+          <div class="page-title"><i class="ti ti-bug-off" style="color:#f59e0b"></i> Bugs reportados</div>
+          <div class="page-sub">Gerencie os bugs enviados pela turma</div>
+        </div>
+
+        <!-- filtros -->
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem;max-width:700px">
+          <select class="inp" id="bugs-filtro-status" style="width:160px;font-size:13px" onchange="carregarBugs()">
+            <option value="">Todos os status</option>
+            <option value="aberto">Aberto</option>
+            <option value="em_analise">Em análise</option>
+            <option value="resolvido">Resolvido</option>
+            <option value="ignorado">Ignorado</option>
+          </select>
+          <select class="inp" id="bugs-filtro-prioridade" style="width:160px;font-size:13px" onchange="carregarBugs()">
+            <option value="">Todas as prioridades</option>
+            <option value="critico">🔴 Crítico</option>
+            <option value="alto">🟠 Alto</option>
+            <option value="medio">🟡 Médio</option>
+            <option value="baixo">🟢 Baixo</option>
+          </select>
+          <button class="btn-secondary" style="font-size:13px" onclick="carregarBugs()"><i class="ti ti-refresh"></i> Atualizar</button>
+        </div>
+
+        <div id="bugs-lista" style="max-width:700px">
+          <div style="color:var(--text-3);font-size:13px">Carregando...</div>
+        </div>
+      </div>
+
       <!-- ── ÚLTIMAS ATUALIZAÇÕES ──────────────────── -->
       <div class="page" id="page-atualizacoes">
         <div class="page-header">
@@ -1433,6 +1548,12 @@ function initApp() {
   document.getElementById('nav-admin').classList.toggle('hidden', !showAdmin);
   document.getElementById('btn-novo-aviso').classList.toggle('hidden', !showAdmin);
   document.getElementById('nav-criar-conta').classList.toggle('hidden', !isDev());
+  // bugs-reportados só pra dev e ajudante_dev
+  const podeVerBugs = ['dev','ajudante_dev'].includes(currentUser.role);
+  document.getElementById('nav-bugs-reportados').classList.toggle('hidden', !podeVerBugs);
+  // report-bug visível pra todos (já está visível por padrão)
+  // garante que seção admin aparece mesmo só pra report-bug
+  if (!showAdmin) document.getElementById('nav-admin-section').classList.remove('hidden');
 
   atualizarSidebarAvatar();
   startHeartbeat();
@@ -1483,7 +1604,8 @@ function navTo(id, el) {
   if (id === 'configuracoes') abrirConfiguracoes();
   if (id === 'perfil')       abrirPerfil();
   if (id === 'admin')        abrirAdmin();
-  if (id === 'atualizacoes') carregarAtualizacoes();
+  if (id === 'atualizacoes')    carregarAtualizacoes();
+  if (id === 'bugs-reportados') carregarBugs();
 }
 
 /* ── CONFIGURAÇÕES ──────────────────────────────────────── */
@@ -2226,6 +2348,91 @@ async function deletarAtualizacao(id) {
     await apiDel(`/atualizacoes/${id}`);
     toast('Removido.', 'success');
     await carregarAtualizacoes();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+/* ── BUGS ────────────────────────────────────────────────── */
+const BUG_PRIO_LABEL  = { critico:'🔴 Crítico', alto:'🟠 Alto', medio:'🟡 Médio', baixo:'🟢 Baixo' };
+const BUG_STATUS_LABEL = { aberto:'Aberto', em_analise:'Em análise', resolvido:'Resolvido', ignorado:'Ignorado' };
+
+async function reportarBug() {
+  const titulo     = document.getElementById('bug-titulo').value.trim();
+  const descricao  = document.getElementById('bug-descricao').value.trim();
+  const pagina     = document.getElementById('bug-pagina').value;
+  const prioridade = document.getElementById('bug-prioridade').value;
+  if (!titulo || !descricao) { toast('Preencha título e descrição.', 'error'); return; }
+  try {
+    await apiPost('/bugs', { titulo, descricao, pagina, prioridade });
+    document.getElementById('bug-titulo').value    = '';
+    document.getElementById('bug-descricao').value = '';
+    document.getElementById('bug-pagina').value    = '';
+    document.getElementById('bug-prioridade').value = 'medio';
+    document.getElementById('bug-enviado').classList.remove('hidden');
+    setTimeout(() => document.getElementById('bug-enviado').classList.add('hidden'), 5000);
+  } catch(e) { toast(e.message || 'Erro ao enviar.', 'error'); }
+}
+
+async function carregarBugs() {
+  const el = document.getElementById('bugs-lista');
+  el.innerHTML = '<div style="color:var(--text-3);font-size:13px">Carregando...</div>';
+  try {
+    let data = await apiGet('/bugs');
+    const filtroStatus    = document.getElementById('bugs-filtro-status')?.value;
+    const filtroPrioridade = document.getElementById('bugs-filtro-prioridade')?.value;
+    if (filtroStatus)     data = data.filter(b => b.status === filtroStatus);
+    if (filtroPrioridade) data = data.filter(b => b.prioridade === filtroPrioridade);
+    if (!data.length) {
+      el.innerHTML = '<div style="color:var(--text-3);font-size:13px">Nenhum bug encontrado.</div>';
+      return;
+    }
+    el.innerHTML = data.map(b => {
+      const dt = new Date(b.criadoEm).toLocaleString('pt-BR', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+      const av = b.iniciais || iniciais(b.autorNome || '?');
+      const deletarBtn = isDev()
+        ? `<button class="btn-danger" style="padding:3px 8px;font-size:12px" onclick="deletarBug(${b.id})"><i class="ti ti-trash"></i></button>`
+        : '';
+      return `
+        <div class="bug-card prio-${b.prioridade} status-${b.status}" id="bug-card-${b.id}">
+          <div class="bug-head">
+            <span class="bug-badge-prio ${b.prioridade}">${BUG_PRIO_LABEL[b.prioridade]}</span>
+            ${b.pagina ? `<span style="font-size:11px;color:var(--text-3);background:var(--bg);padding:2px 8px;border-radius:20px;border:1px solid var(--border)">${b.pagina}</span>` : ''}
+            <div class="bug-titulo-text">${b.titulo}</div>
+            ${deletarBtn}
+          </div>
+          <div style="font-size:13px;color:var(--text-2);line-height:1.6;margin-bottom:.75rem;white-space:pre-wrap">${b.descricao}</div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <span class="member-avatar" style="font-size:10px;width:24px;height:24px;flex-shrink:0">${av}</span>
+            <span style="font-size:12px;color:var(--text-3)">${b.autorNome || '?'} · ${dt}</span>
+            <select class="bug-status-select" onchange="mudarStatusBug(${b.id}, this.value)" style="margin-left:auto">
+              ${['aberto','em_analise','resolvido','ignorado'].map(s =>
+                `<option value="${s}" ${b.status===s?'selected':''}>${BUG_STATUS_LABEL[s]}</option>`
+              ).join('')}
+            </select>
+          </div>
+        </div>`;
+    }).join('');
+  } catch(e) {
+    el.innerHTML = '<div style="color:var(--text-3);font-size:13px">Sem permissão ou erro ao carregar.</div>';
+  }
+}
+
+async function mudarStatusBug(id, status) {
+  try {
+    await apiFetch(`/bugs/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) });
+    const card = document.getElementById(`bug-card-${id}`);
+    if (card) {
+      card.className = card.className.replace(/status-\w+/, `status-${status}`);
+    }
+    toast('Status atualizado!', 'success');
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function deletarBug(id) {
+  if (!confirm('Deletar este bug?')) return;
+  try {
+    await apiDel(`/bugs/${id}`);
+    toast('Bug removido.', 'success');
+    await carregarBugs();
   } catch(e) { toast(e.message, 'error'); }
 }
 
