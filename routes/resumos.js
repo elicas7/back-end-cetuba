@@ -1,7 +1,8 @@
-// src/routes/resumos.js
+// routes/resumos.js
 const router = require('express').Router();
 const pool   = require('../db');
 const { auth, podeEditar } = require('../middleware/auth');
+const { registrarLog }     = require('../middleware/log');
 
 // GET /resumos
 router.get('/', auth, async (req, res) => {
@@ -30,10 +31,8 @@ router.get('/', auth, async (req, res) => {
 // POST /resumos
 router.post('/', auth, podeEditar, async (req, res) => {
   const { titulo, disciplina, corpo } = req.body;
-  if (!titulo || !disciplina || !corpo) {
+  if (!titulo || !disciplina || !corpo)
     return res.status(400).json({ message: 'Título, disciplina e corpo são obrigatórios.' });
-  }
-
   try {
     const { rows } = await pool.query(
       `INSERT INTO resumos (titulo, disciplina, corpo, autor_id, turma_id)
@@ -41,6 +40,11 @@ router.post('/', auth, podeEditar, async (req, res) => {
        RETURNING id, titulo, disciplina, corpo, curtidas, criado_em AS "criadoEm"`,
       [titulo, disciplina, corpo, req.user.id, req.user.turma_id]
     );
+    await registrarLog({
+      usuarioId: req.user.id, turmaId: req.user.turma_id,
+      acao: 'resumo:criar',
+      descricao: `Criou o resumo "${titulo}" (${disciplina})`,
+    });
     return res.status(201).json(rows[0]);
   } catch (err) {
     console.error(err);
@@ -52,35 +56,18 @@ router.post('/', auth, podeEditar, async (req, res) => {
 router.post('/:id/curtir', auth, async (req, res) => {
   const resumoId  = parseInt(req.params.id);
   const usuarioId = req.user.id;
-
   try {
-    // Verifica se já curtiu
     const { rows: exist } = await pool.query(
       `SELECT 1 FROM curtidas_resumo WHERE usuario_id = $1 AND resumo_id = $2`,
       [usuarioId, resumoId]
     );
-
     if (exist.length > 0) {
-      // Descurtir
-      await pool.query(
-        `DELETE FROM curtidas_resumo WHERE usuario_id = $1 AND resumo_id = $2`,
-        [usuarioId, resumoId]
-      );
-      await pool.query(
-        `UPDATE resumos SET curtidas = GREATEST(0, curtidas - 1) WHERE id = $1`,
-        [resumoId]
-      );
+      await pool.query(`DELETE FROM curtidas_resumo WHERE usuario_id = $1 AND resumo_id = $2`, [usuarioId, resumoId]);
+      await pool.query(`UPDATE resumos SET curtidas = GREATEST(0, curtidas - 1) WHERE id = $1`, [resumoId]);
       return res.json({ curtido: false });
     } else {
-      // Curtir
-      await pool.query(
-        `INSERT INTO curtidas_resumo (usuario_id, resumo_id) VALUES ($1, $2)`,
-        [usuarioId, resumoId]
-      );
-      await pool.query(
-        `UPDATE resumos SET curtidas = curtidas + 1 WHERE id = $1`,
-        [resumoId]
-      );
+      await pool.query(`INSERT INTO curtidas_resumo (usuario_id, resumo_id) VALUES ($1, $2)`, [usuarioId, resumoId]);
+      await pool.query(`UPDATE resumos SET curtidas = curtidas + 1 WHERE id = $1`, [resumoId]);
       return res.json({ curtido: true });
     }
   } catch (err) {
@@ -92,10 +79,17 @@ router.post('/:id/curtir', auth, async (req, res) => {
 // DELETE /resumos/:id
 router.delete('/:id', auth, podeEditar, async (req, res) => {
   try {
-    await pool.query(
-      `DELETE FROM resumos WHERE id = $1 AND turma_id = $2`,
+    const { rows } = await pool.query(
+      `DELETE FROM resumos WHERE id = $1 AND turma_id = $2 RETURNING titulo`,
       [req.params.id, req.user.turma_id]
     );
+    if (rows[0]) {
+      await registrarLog({
+        usuarioId: req.user.id, turmaId: req.user.turma_id,
+        acao: 'resumo:deletar',
+        descricao: `Deletou o resumo "${rows[0].titulo}"`,
+      });
+    }
     return res.json({ ok: true });
   } catch (err) {
     return res.status(500).json({ message: 'Erro ao deletar resumo.' });
