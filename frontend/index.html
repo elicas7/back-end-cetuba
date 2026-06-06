@@ -603,6 +603,29 @@ body.dark .aula-qui,.dark .aula-ed,.dark .aula-fil,.dark .aula-ing,.dark .aula-a
   display: flex; align-items: center; justify-content: center; z-index: 200;
 }
 .loading-overlay.hidden { display: none; }
+/* ── CARDS DE ATUALIZAÇÃO ──────────────────────────────── */
+.upd-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.25rem 1.5rem;
+  max-width: 640px; margin-bottom: 1rem;
+  border-left: 4px solid var(--primary);
+  transition: box-shadow .15s;
+}
+.upd-card:hover { box-shadow: var(--shadow-md); }
+.upd-card.tipo-novidade  { border-left-color: #8b5cf6; }
+.upd-card.tipo-melhoria  { border-left-color: #0891b2; }
+.upd-card.tipo-correcao  { border-left-color: #f59e0b; }
+.upd-card.tipo-aviso     { border-left-color: #ef4444; }
+.upd-head { display:flex; align-items:center; gap:10px; margin-bottom:.5rem; flex-wrap:wrap; }
+.upd-titulo { font-size:15px; font-weight:700; color:var(--text-1); flex:1; }
+.upd-badge { font-size:11px; font-weight:600; padding:3px 8px; border-radius:20px; }
+.upd-badge.tipo-novidade { background:#ede9fe; color:#6d28d9; }
+.upd-badge.tipo-melhoria { background:#cffafe; color:#0e7490; }
+.upd-badge.tipo-correcao { background:#fef3c7; color:#92400e; }
+.upd-badge.tipo-aviso    { background:#fee2e2; color:#b91c1c; }
+.upd-versao { font-size:11px; color:var(--text-3); background:var(--bg); padding:2px 8px; border-radius:20px; border:1px solid var(--border); }
+.upd-corpo { font-size:13.5px; color:var(--text-2); line-height:1.65; white-space:pre-wrap; }
+.upd-meta  { font-size:11px; color:var(--text-3); margin-top:.75rem; display:flex; align-items:center; gap:6px; }
 </style>
 </head>
 <body>
@@ -676,6 +699,7 @@ body.dark .aula-qui,.dark .aula-ed,.dark .aula-fil,.dark .aula-ing,.dark .aula-a
         <div class="nav-section">Turma</div>
         <div class="nav-item" onclick="navTo('lideranca',this)"><i class="ti ti-shield-star"></i> Liderança</div>
         <div class="nav-item" onclick="navTo('creditos',this)"><i class="ti ti-award"></i> Créditos</div>
+        <div class="nav-item" onclick="navTo('atualizacoes',this)"><i class="ti ti-speakerphone"></i> Últimas atualizações</div>
         <div class="nav-section hidden" id="nav-admin-section">Administração</div>
         <div class="nav-item hidden" id="nav-admin" onclick="navTo('admin',this)"><i class="ti ti-settings-2"></i> Painel Admin</div>
         <div class="nav-item hidden" id="nav-criar-conta" onclick="navTo('criar-conta',this)"><i class="ti ti-user-plus"></i> Criar conta</div>
@@ -1124,6 +1148,48 @@ body.dark .aula-qui,.dark .aula-ed,.dark .aula-fil,.dark .aula-ing,.dark .aula-a
         </div>
       </div>
 
+      <!-- ── ÚLTIMAS ATUALIZAÇÕES ──────────────────── -->
+      <div class="page" id="page-atualizacoes">
+        <div class="page-header">
+          <div class="page-title">Últimas atualizações</div>
+          <div class="page-sub">Novidades e mudanças do sistema</div>
+        </div>
+
+        <!-- form somente dev -->
+        <div id="form-atualizacao" class="card hidden" style="max-width:560px;margin-bottom:1.5rem">
+          <div class="card-header"><span class="ch-title"><i class="ti ti-plus"></i> Nova atualização</span></div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+            <input class="inp" id="upd-titulo" placeholder="Título (ex: v1.2 — Perfis de usuário)" />
+            <div style="display:flex;gap:8px">
+              <select class="inp" id="upd-tipo" style="width:180px">
+                <option value="novidade">✨ Novidade</option>
+                <option value="melhoria">🔧 Melhoria</option>
+                <option value="correcao">🐛 Correção</option>
+                <option value="aviso">📢 Aviso</option>
+              </select>
+              <input class="inp" id="upd-versao" placeholder="Versão (ex: 1.2.0)" style="width:130px" />
+            </div>
+            <textarea class="inp" id="upd-corpo" rows="4" placeholder="Descreva o que mudou..."></textarea>
+            <div style="display:flex;gap:8px">
+              <button class="btn-primary" onclick="publicarAtualizacao()"><i class="ti ti-send"></i> Publicar</button>
+              <button class="btn-secondary" onclick="document.getElementById('form-atualizacao').classList.add('hidden')">Cancelar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- botão abrir form (só dev) -->
+        <div id="btn-nova-atualizacao-wrap" class="hidden" style="margin-bottom:1rem">
+          <button class="btn-primary" onclick="document.getElementById('form-atualizacao').classList.toggle('hidden')">
+            <i class="ti ti-plus"></i> Nova atualização
+          </button>
+        </div>
+
+        <!-- lista de atualizações -->
+        <div id="atualizacoes-list">
+          <div style="color:var(--text-3);font-size:13px">Carregando...</div>
+        </div>
+      </div>
+
       <!-- ── PERFIL ──────────────────────────────────── -->
       <div class="page" id="page-perfil">
         <div class="page-header">
@@ -1370,6 +1436,7 @@ function initApp() {
 
   atualizarSidebarAvatar();
   startHeartbeat();
+  if (isDev()) document.getElementById('btn-nova-atualizacao-wrap').classList.remove('hidden');
 
   // Elementos de edição aparecem para quem pode editar
   if (podeEditar()) {
@@ -1411,11 +1478,12 @@ function navTo(id, el) {
   if (pg) pg.classList.add('active');
   if (el) el.classList.add('active');
   // carrega dados específicos da aba
-  if (id === 'lideranca') carregarLideranca();
-  if (id === 'creditos')  carregarCreditos();
+  if (id === 'lideranca')    carregarLideranca();
+  if (id === 'creditos')     carregarCreditos();
   if (id === 'configuracoes') abrirConfiguracoes();
-  if (id === 'perfil') abrirPerfil();
-  if (id === 'admin')  abrirAdmin();
+  if (id === 'perfil')       abrirPerfil();
+  if (id === 'admin')        abrirAdmin();
+  if (id === 'atualizacoes') carregarAtualizacoes();
 }
 
 /* ── CONFIGURAÇÕES ──────────────────────────────────────── */
@@ -2096,6 +2164,70 @@ function startHeartbeat() {
   setInterval(ping, 90_000);
 }
 
+
+/* ── ÚLTIMAS ATUALIZAÇÕES ────────────────────────────────── */
+const UPD_LABEL = { novidade:'✨ Novidade', melhoria:'🔧 Melhoria', correcao:'🐛 Correção', aviso:'📢 Aviso' };
+
+async function carregarAtualizacoes() {
+  const el = document.getElementById('atualizacoes-list');
+  el.innerHTML = '<div style="color:var(--text-3);font-size:13px">Carregando...</div>';
+  try {
+    const data = await apiGet('/atualizacoes');
+    if (!data.length) {
+      el.innerHTML = '<div style="color:var(--text-3);font-size:13px">Nenhuma atualização publicada ainda.</div>';
+      return;
+    }
+    el.innerHTML = data.map(u => {
+      const dt = new Date(u.criadoEm).toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' });
+      const deletarBtn = isDev()
+        ? `<button class="btn-danger" style="margin-left:auto;padding:3px 8px;font-size:12px" onclick="deletarAtualizacao(${u.id})"><i class="ti ti-trash"></i></button>`
+        : '';
+      return `
+        <div class="upd-card tipo-${u.tipo}">
+          <div class="upd-head">
+            <span class="upd-badge tipo-${u.tipo}">${UPD_LABEL[u.tipo] || u.tipo}</span>
+            ${u.versao ? `<span class="upd-versao">v${u.versao}</span>` : ''}
+            <div class="upd-titulo">${u.titulo}</div>
+            ${deletarBtn}
+          </div>
+          <div class="upd-corpo">${u.corpo}</div>
+          <div class="upd-meta">
+            <i class="ti ti-user" style="font-size:12px"></i> ${u.autorNome || 'Dev'}
+            <span>·</span>
+            <i class="ti ti-calendar" style="font-size:12px"></i> ${dt}
+          </div>
+        </div>`;
+    }).join('');
+  } catch(e) {
+    el.innerHTML = '<div style="color:var(--text-3);font-size:13px">Erro ao carregar atualizações.</div>';
+  }
+}
+
+async function publicarAtualizacao() {
+  const titulo = document.getElementById('upd-titulo').value.trim();
+  const corpo  = document.getElementById('upd-corpo').value.trim();
+  const tipo   = document.getElementById('upd-tipo').value;
+  const versao = document.getElementById('upd-versao').value.trim();
+  if (!titulo || !corpo) { toast('Preencha título e descrição.', 'error'); return; }
+  try {
+    await apiPost('/atualizacoes', { titulo, corpo, tipo, versao });
+    toast('Atualização publicada!', 'success');
+    document.getElementById('upd-titulo').value = '';
+    document.getElementById('upd-corpo').value  = '';
+    document.getElementById('upd-versao').value = '';
+    document.getElementById('form-atualizacao').classList.add('hidden');
+    await carregarAtualizacoes();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function deletarAtualizacao(id) {
+  if (!confirm('Remover esta atualização?')) return;
+  try {
+    await apiDel(`/atualizacoes/${id}`);
+    toast('Removido.', 'success');
+    await carregarAtualizacoes();
+  } catch(e) { toast(e.message, 'error'); }
+}
 
 function formatData(iso) {
   if (!iso) return '';
