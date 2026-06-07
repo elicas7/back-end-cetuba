@@ -54,3 +54,39 @@ router.delete('/:id', auth, podeEditar, async (req, res) => {
 });
 
 module.exports = router;
+
+// POST /provas/:id/entrega — toggle entrega
+router.post('/:id/entrega', auth, async (req, res) => {
+  const provaId   = parseInt(req.params.id);
+  const usuarioId = req.user.id;
+  try {
+    const { rows: exist } = await pool.query(
+      `SELECT 1 FROM entregas WHERE prova_id = $1 AND usuario_id = $2`,
+      [provaId, usuarioId]
+    );
+    if (exist.length > 0) {
+      await pool.query(`DELETE FROM entregas WHERE prova_id = $1 AND usuario_id = $2`, [provaId, usuarioId]);
+      return res.json({ entregue: false });
+    } else {
+      await pool.query(`INSERT INTO entregas (prova_id, usuario_id) VALUES ($1, $2)`, [provaId, usuarioId]);
+      return res.json({ entregue: true });
+    }
+  } catch (err) {
+    return res.status(500).json({ message: 'Erro ao marcar entrega.' });
+  }
+});
+
+// GET /provas/:id/entregas — lista quem entregou (podeEditar)
+router.get('/:id/entregas', auth, async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT u.nome, u.usuario, u.iniciais, e.entregue_em AS "entregueEm"
+         FROM entregas e JOIN usuarios u ON u.id = e.usuario_id
+        WHERE e.prova_id = $1 ORDER BY e.entregue_em`,
+      [req.params.id]
+    );
+    return res.json(rows);
+  } catch (err) {
+    return res.status(500).json({ message: 'Erro.' });
+  }
+});
