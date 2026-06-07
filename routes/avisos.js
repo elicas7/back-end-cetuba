@@ -4,6 +4,13 @@ const pool   = require('../db');
 const { auth, podeEditar } = require('../middleware/auth');
 const { registrarLog }     = require('../middleware/log');
 
+let notif = null;
+// lazy load para evitar circular dependency
+function getNotif() {
+  if (!notif) notif = require('./notificacoes');
+  return notif;
+}
+
 router.get('/', auth, async (req, res) => {
   try {
     const { rows } = await pool.query(
@@ -27,10 +34,13 @@ router.post('/', auth, podeEditar, async (req, res) => {
        RETURNING id, titulo, corpo, tipo, criado_em AS "criadoEm"`,
       [titulo, corpo, tipo, req.user.id, req.user.turma_id]
     );
-    await registrarLog({
-      usuarioId: req.user.id, turmaId: req.user.turma_id,
-      acao: 'aviso:criar',
-      descricao: `Criou aviso "${titulo}"`,
+    await registrarLog({ usuarioId: req.user.id, turmaId: req.user.turma_id, acao: 'aviso:criar', descricao: `Criou aviso "${titulo}"` });
+    // notificação em tempo real
+    await getNotif().criarNotificacao(pool, {
+      turmaId: req.user.turma_id,
+      tipo: 'aviso',
+      titulo: `📢 Novo aviso: ${titulo}`,
+      corpo: corpo.slice(0, 120),
     });
     return res.status(201).json(rows[0]);
   } catch (err) { return res.status(500).json({ message: 'Erro ao criar aviso.' }); }
@@ -42,13 +52,7 @@ router.delete('/:id', auth, podeEditar, async (req, res) => {
       `DELETE FROM avisos WHERE id = $1 AND turma_id = $2 RETURNING titulo`,
       [req.params.id, req.user.turma_id]
     );
-    if (rows[0]) {
-      await registrarLog({
-        usuarioId: req.user.id, turmaId: req.user.turma_id,
-        acao: 'aviso:deletar',
-        descricao: `Deletou aviso "${rows[0].titulo}"`,
-      });
-    }
+    if (rows[0]) await registrarLog({ usuarioId: req.user.id, turmaId: req.user.turma_id, acao: 'aviso:deletar', descricao: `Deletou aviso "${rows[0].titulo}"` });
     return res.json({ ok: true });
   } catch (err) { return res.status(500).json({ message: 'Erro ao deletar aviso.' }); }
 });
