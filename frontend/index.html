@@ -2963,7 +2963,6 @@ async function toggleEntrega(provaId) {
   } catch(e) { toast(e.message, 'error'); }
 }
 
-function formatData(iso) {
 (function() {
   const banner = document.getElementById('offline-banner');
   const text   = document.getElementById('offline-text');
@@ -2984,7 +2983,6 @@ function formatData(iso) {
     if (wasOffline) { mostrar('✓  Conexão restaurada', true); wasOffline = false; }
   });
 
-  // verifica ao carregar
   if (!navigator.onLine) mostrar('⚠️  Sem conexão — verifique sua internet');
 })();
 
