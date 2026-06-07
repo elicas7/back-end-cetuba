@@ -1043,7 +1043,7 @@ body.dark .aula-qui,.dark .aula-ed,.dark .aula-fil,.dark .aula-ing,.dark .aula-a
         <div class="credits-wrap">
           <div class="credits-hero">
             <h2>Central da Turma</h2>
-            <p>Sistema de organização e comunicação do 7º Ano · Versão 2.0</p>
+            <p>Sistema de organização e comunicação do 7º Ano · Versão 2.4</p>
           </div>
           <div class="credits-section">
             <h3>Desenvolvimento</h3>
@@ -1057,7 +1057,7 @@ body.dark .aula-qui,.dark .aula-ed,.dark .aula-fil,.dark .aula-ing,.dark .aula-a
             <h3>Ajudante de desenvolvimento</h3>
             <div id="credits-ajuda"></div>
           </div>
-          <div class="credits-version">Central da Turma v2.0 · 7º Ano · 2026</div>
+          <div class="credits-version">Central da Turma v2.4 · 7º Ano · 2026</div>
         </div>
       </div>
 
@@ -1526,7 +1526,7 @@ async function apiFetch(endpoint, opts = {}) {
   const headers = { 'Content-Type': 'application/json', ...opts.headers };
   if (token) headers['Authorization'] = `Bearer ${token}`;
   const res = await fetch(BASE_URL + endpoint, { ...opts, headers });
-  if (res.status === 401) { doLogout(); throw new Error('Sessão expirada'); }
+  if (res.status === 401) { doLogout(false); throw new Error('Sessão expirada'); }
   if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.message || 'Erro na requisição'); }
   return res.json();
 }
@@ -1578,13 +1578,14 @@ async function doLogin() {
   }
 }
 
-function doLogout() {
+function doLogout(showToast = true) {
   token = null; currentUser = null;
   sessionStorage.removeItem('ct_token');
   document.getElementById('app').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('inp-user').value = '';
   document.getElementById('inp-pass').value = '';
+  if (showToast) toast('Sessão encerrada.', 'default');
 }
 
 /* ── INIT APP ───────────────────────────────────────────── */
