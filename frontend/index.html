@@ -800,9 +800,23 @@ body.dark .aula-qui,.dark .aula-ed,.dark .aula-fil,.dark .aula-ing,.dark .aula-a
         </div>
         <div class="sb-user">
           <div class="sb-avatar" id="sb-avatar">--</div>
-          <div>
+          <div style="flex:1;min-width:0">
             <div class="sb-uname" id="sb-name">Carregando...</div>
             <div class="sb-urole" id="sb-role">—</div>
+          </div>
+          <!-- sininho -->
+          <div style="position:relative;flex-shrink:0">
+            <button id="notif-btn" onclick="toggleNotifPanel()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:4px;border-radius:6px;display:flex;align-items:center">
+              <i class="ti ti-bell" style="font-size:19px"></i>
+              <span id="notif-badge" style="display:none;position:absolute;top:0;right:0;background:#ef4444;color:#fff;font-size:9px;font-weight:700;min-width:14px;height:14px;border-radius:8px;align-items:center;justify-content:center;padding:0 2px"></span>
+            </button>
+            <div id="notif-panel" style="display:none;position:absolute;right:-8px;top:36px;width:290px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-md);z-index:500;max-height:360px;overflow-y:auto">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem 1rem;border-bottom:1px solid var(--border)">
+                <span style="font-weight:700;font-size:13px;color:var(--text-1)">Notificações</span>
+                <button onclick="lerTodasNotif()" style="background:none;border:none;cursor:pointer;font-size:11px;color:var(--primary)">Marcar lidas</button>
+              </div>
+              <div id="notif-list"><div style="padding:1rem;font-size:13px;color:var(--text-3)">Sem notificações.</div></div>
+            </div>
           </div>
         </div>
       </div>
@@ -1641,6 +1655,9 @@ function initApp() {
   atualizarSidebarAvatar();
   startHeartbeat();
   if (isDev()) document.getElementById('btn-nova-atualizacao-wrap').classList.remove('hidden');
+  // notificações
+  carregarNotificacoes();
+  conectarSSE();
 
   // Elementos de edição aparecem para quem pode editar
   if (podeEditar()) {
@@ -1836,10 +1853,11 @@ function renderMateriais(list) {
       <div class="mat-icon mi-${m.tipo}"><i class="ti ${tipoIcon(m.tipo)}"></i></div>
       <div class="mat-info">
         <div class="mat-name">${m.nome}</div>
-        <div class="mat-meta">${m.tipo.toUpperCase()} · ${tamanho} · enviado por ${m.enviadoPor||'—'} · ${formatData(m.criadoEm)}</div>
+        <div class="mat-meta">${m.tipo.toUpperCase()} · ${tamanho} · ${m.enviadoPor||'—'} · ${formatData(m.criadoEm)}</div>
       </div>
       <span class="tag ${discTag(m.disciplina)}" style="margin-right:8px;white-space:nowrap">${m.disciplina}</span>
-      <a href="${url}" target="_blank" class="btn-dl"><i class="ti ti-download"></i> Baixar</a>
+      <span style="font-size:11px;color:var(--text-3);margin-right:8px;white-space:nowrap"><i class="ti ti-download" style="font-size:11px"></i> ${m.downloads||0}</span>
+      <a href="${url}" target="_blank" class="btn-dl" onclick="registrarDownload(${m.id})"><i class="ti ti-download"></i> Baixar</a>
       ${podeEditar() ? `<button class="btn-danger" onclick="deletarMaterial(${m.id})"><i class="ti ti-trash"></i></button>` : ''}
     </div>`;
   }).join('');
@@ -1902,10 +1920,22 @@ async function carregarResumos() {
             <button class="btn-like ${r.curtido ? 'liked' : ''}" onclick="curtirResumo(${r.id}, this)">
               <i class="ti ti-heart"></i> <span>${r.curtidas}</span>
             </button>
+            <button class="btn-secondary" style="font-size:12px;padding:5px 9px" onclick="toggleComentarios(${r.id})">
+              <i class="ti ti-message-circle"></i> <span id="coment-count-${r.id}">${r.totalComentarios||0}</span>
+            </button>
             ${podeEditar() ? `<button class="btn-danger" onclick="deletarResumo(${r.id})"><i class="ti ti-trash"></i></button>` : ''}
           </div>
         </div>
         <div class="resumo-body">${r.corpo}</div>
+        <!-- seção de comentários (lazy) -->
+        <div id="comentarios-${r.id}" style="display:none;margin-top:1rem;border-top:1px solid var(--border);padding-top:.75rem">
+          <div id="coment-list-${r.id}" style="margin-bottom:.75rem"></div>
+          <div style="display:flex;gap:8px">
+            <input class="inp" id="coment-inp-${r.id}" placeholder="Escrever comentário..." maxlength="500" style="flex:1;font-size:13px"
+              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviarComentario(${r.id})}" />
+            <button class="btn-primary" style="padding:7px 12px" onclick="enviarComentario(${r.id})"><i class="ti ti-send"></i></button>
+          </div>
+        </div>
       </div>`).join('') : '<div style="color:var(--text-3);font-size:13px">Nenhum resumo ainda.</div>';
     document.getElementById('stat-resumos').textContent = data.length;
     document.getElementById('adm-stat-res').textContent = data.length;
@@ -1968,7 +1998,10 @@ async function carregarProvas() {
             <div class="prova-det">${p.conteudo}${p.horario ? ' · ' + p.horario : ''}</div>
           </div>
           <span class="dias-badge ${cls}">${dias <= 0 ? 'hoje!' : dias + ' dias'}</span>
-          ${podeEditar() ? `<button class="btn-danger" style="margin-left:8px" onclick="deletarProva(${p.id})"><i class="ti ti-trash"></i></button>` : ''}
+          <button id="entrega-btn-${p.id}" class="btn-secondary" style="font-size:12px;padding:5px 10px;margin-left:6px" onclick="toggleEntrega(${p.id})">
+            <i class="ti ti-circle-check"></i> <span>Entreguei</span>
+          </button>
+          ${podeEditar() ? `<button class="btn-danger" style="margin-left:4px" onclick="deletarProva(${p.id})"><i class="ti ti-trash"></i></button>` : ''}
         </div>`;
     }).join('');
     document.getElementById('adm-stat-prov').textContent = data.length;
@@ -1978,6 +2011,8 @@ async function carregarProvas() {
       const d = diasAte(prox.data);
       document.getElementById('stat-prova-dias').textContent = d <= 0 ? 'hoje!' : d + ' dias';
     }
+    // carrega entregas do usuário
+    data.forEach(p => carregarEntregaProva(p.id));
   } catch(e) { console.error('Provas:', e); }
 }
 
@@ -2748,7 +2783,187 @@ function skeletonLinhas(n = 4) {
   ).join('')}</div>`;
 }
 
-/* ── OFFLINE DETECTOR ────────────────────────────────────── */
+/* ── COMENTÁRIOS ─────────────────────────────────────────── */
+async function toggleComentarios(resumoId) {
+  const sec = document.getElementById(`comentarios-${resumoId}`);
+  if (sec.style.display === 'none') {
+    sec.style.display = 'block';
+    await carregarComentarios(resumoId);
+  } else {
+    sec.style.display = 'none';
+  }
+}
+
+async function carregarComentarios(resumoId) {
+  const el = document.getElementById(`coment-list-${resumoId}`);
+  el.innerHTML = skeletonLinhas(2);
+  try {
+    const data = await apiGet(`/comentarios/${resumoId}`);
+    if (!data.length) { el.innerHTML = '<div style="font-size:12px;color:var(--text-3)">Sem comentários ainda. Seja o primeiro!</div>'; return; }
+    el.innerHTML = data.map(c => {
+      const av = c.iniciais || iniciais(c.autorNome || '?');
+      const dt = new Date(c.criadoEm).toLocaleString('pt-BR', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+      const podeApagar = c.autorId === currentUser?.id || ['lider','ajudante_dev','dev'].includes(currentUser?.role);
+      return `
+        <div style="display:flex;gap:8px;margin-bottom:.75rem" id="coment-${c.id}">
+          <span class="member-avatar" style="width:28px;height:28px;font-size:10px;flex-shrink:0">${av}</span>
+          <div style="flex:1;background:var(--bg);border-radius:8px;padding:7px 10px;border:1px solid var(--border)">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+              <span style="font-size:12px;font-weight:600;color:var(--text-1)">${c.autorNome}</span>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-size:11px;color:var(--text-3)">${dt}</span>
+                ${podeApagar ? `<button onclick="deletarComentario(${c.id},${resumoId})" style="background:none;border:none;cursor:pointer;color:var(--text-3);font-size:12px;padding:0"><i class="ti ti-x"></i></button>` : ''}
+              </div>
+            </div>
+            <div style="font-size:13px;color:var(--text-2)">${c.corpo}</div>
+          </div>
+        </div>`;
+    }).join('');
+  } catch(e) { el.innerHTML = '<div style="font-size:12px;color:var(--text-3)">Erro ao carregar.</div>'; }
+}
+
+async function enviarComentario(resumoId) {
+  const inp = document.getElementById(`coment-inp-${resumoId}`);
+  const corpo = inp.value.trim();
+  if (!corpo) return;
+  try {
+    await apiPost(`/comentarios/${resumoId}`, { corpo });
+    inp.value = '';
+    await carregarComentarios(resumoId);
+    const count = document.getElementById(`coment-count-${resumoId}`);
+    if (count) count.textContent = parseInt(count.textContent || 0) + 1;
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function deletarComentario(id, resumoId) {
+  try {
+    await apiDel(`/comentarios/${id}`);
+    document.getElementById(`coment-${id}`)?.remove();
+    const count = document.getElementById(`coment-count-${resumoId}`);
+    if (count) count.textContent = Math.max(0, parseInt(count.textContent || 0) - 1);
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+/* ── NOTIFICAÇÕES ────────────────────────────────────────── */
+let notifPanelAberto = false;
+let naoLidas = 0;
+
+function toggleNotifPanel() {
+  const panel = document.getElementById('notif-panel');
+  notifPanelAberto = !notifPanelAberto;
+  panel.style.display = notifPanelAberto ? 'block' : 'none';
+  if (notifPanelAberto) carregarNotificacoes();
+}
+
+// fecha ao clicar fora
+document.addEventListener('click', e => {
+  if (notifPanelAberto && !document.getElementById('notif-btn').contains(e.target) && !document.getElementById('notif-panel').contains(e.target)) {
+    document.getElementById('notif-panel').style.display = 'none';
+    notifPanelAberto = false;
+  }
+});
+
+async function carregarNotificacoes() {
+  const el = document.getElementById('notif-list');
+  try {
+    const data = await apiGet('/notificacoes');
+    naoLidas = data.filter(n => !n.lida).length;
+    atualizarBadge();
+    if (!data.length) { el.innerHTML = '<div style="padding:1rem;font-size:13px;color:var(--text-3)">Nenhuma notificação ainda.</div>'; return; }
+    el.innerHTML = data.map(n => {
+      const dt = new Date(n.criadoEm).toLocaleString('pt-BR', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+      return `<div style="padding:.7rem 1rem;border-bottom:1px solid var(--border);${n.lida?'opacity:.6':'background:var(--bg)'}">
+        <div style="font-size:13px;font-weight:${n.lida?'400':'600'};color:var(--text-1)">${n.titulo}</div>
+        ${n.corpo ? `<div style="font-size:12px;color:var(--text-2);margin-top:2px">${n.corpo}</div>` : ''}
+        <div style="font-size:11px;color:var(--text-3);margin-top:4px">${dt}</div>
+      </div>`;
+    }).join('');
+  } catch(e) { el.innerHTML = '<div style="padding:1rem;font-size:13px;color:var(--text-3)">Erro ao carregar.</div>'; }
+}
+
+function atualizarBadge() {
+  const badge = document.getElementById('notif-badge');
+  if (naoLidas > 0) {
+    badge.style.display = 'flex';
+    badge.textContent = naoLidas > 9 ? '9+' : naoLidas;
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+async function lerTodasNotif() {
+  try {
+    await apiFetch('/notificacoes/ler-todas', { method: 'PATCH' });
+    naoLidas = 0;
+    atualizarBadge();
+    await carregarNotificacoes();
+  } catch(e) {}
+}
+
+function conectarSSE() {
+  if (!token) return;
+  const evtSource = new EventSource(`${BASE_URL}/notificacoes/stream?token=${token}`);
+  evtSource.onmessage = (e) => {
+    try {
+      const notif = JSON.parse(e.data);
+      naoLidas++;
+      atualizarBadge();
+      toast(`🔔 ${notif.titulo}`, 'default');
+      if (notifPanelAberto) carregarNotificacoes();
+    } catch(_) {}
+  };
+  evtSource.onerror = () => {
+    evtSource.close();
+    // reconecta após 10s
+    setTimeout(conectarSSE, 10000);
+  };
+}
+
+/* ── DOWNLOAD COUNTER ────────────────────────────────────── */
+function registrarDownload(id) {
+  apiPost(`/materiais/${id}/download`).catch(() => {});
+}
+
+/* ── ENTREGAS ────────────────────────────────────────────── */
+const entregasLocal = new Set(); // IDs de provas já entregues
+
+async function carregarEntregaProva(provaId) {
+  // verifica via endpoint de entregas
+  try {
+    const data = await apiGet(`/provas/${provaId}/entregas`);
+    const entregou = data.some(e => e.usuario === currentUser?.usuario);
+    const btn = document.getElementById(`entrega-btn-${provaId}`);
+    if (!btn) return;
+    if (entregou) {
+      entregasLocal.add(provaId);
+      btn.classList.add('btn-primary');
+      btn.classList.remove('btn-secondary');
+      btn.innerHTML = '<i class="ti ti-circle-check-filled"></i> <span>Entregue ✓</span>';
+    }
+  } catch(_) {}
+}
+
+async function toggleEntrega(provaId) {
+  try {
+    const res = await apiPost(`/provas/${provaId}/entrega`);
+    const btn = document.getElementById(`entrega-btn-${provaId}`);
+    if (res.entregue) {
+      entregasLocal.add(provaId);
+      btn.classList.add('btn-primary');
+      btn.classList.remove('btn-secondary');
+      btn.innerHTML = '<i class="ti ti-circle-check-filled"></i> <span>Entregue ✓</span>';
+      toast('Marcado como entregue!', 'success');
+    } else {
+      entregasLocal.delete(provaId);
+      btn.classList.remove('btn-primary');
+      btn.classList.add('btn-secondary');
+      btn.innerHTML = '<i class="ti ti-circle-check"></i> <span>Entreguei</span>';
+      toast('Marcação removida.', 'default');
+    }
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+function formatData(iso) {
 (function() {
   const banner = document.getElementById('offline-banner');
   const text   = document.getElementById('offline-text');
