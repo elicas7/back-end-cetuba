@@ -170,6 +170,17 @@ body {
 .nav-item i { font-size: 18px; flex-shrink: 0; }
 .nav-item:hover { color: var(--text-1); background: var(--bg); }
 .nav-item.active { color: var(--primary); border-left-color: var(--primary); background: var(--primary-light); font-weight: 600; }
+.nav-badge {
+  margin-left: auto; background: var(--danger, #ef4444); color: #fff;
+  font-size: 11px; font-weight: 700; line-height: 1; border-radius: 999px;
+  padding: 3px 7px; min-width: 18px; text-align: center;
+}
+.aviso-item.nao-lido { border-left: 3px solid var(--primary, #1a56db); }
+.aviso-item .btn-marcar-lido {
+  font-size: 11px; font-weight: 600; color: var(--primary, #1a56db);
+  background: none; border: none; cursor: pointer; padding: 2px 0; white-space: nowrap;
+}
+.aviso-item .aviso-lido-tag { font-size: 11px; color: var(--text-3); white-space: nowrap; }
 .sb-footer { padding: .75rem 1rem; border-top: 1px solid var(--border-soft); }
 .btn-logout {
   display: flex; align-items: center; gap: 8px;
@@ -186,11 +197,8 @@ body {
   max-width: calc(100vw - var(--sidebar-w));
 }
 .page { display: none; }
-.page.active { display: block; animation: pageEnter .22s cubic-bezier(.4,0,.2,1); }
-@keyframes pageEnter {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+.page.active { display: block; animation: fadeIn .2s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 .page-header { margin-bottom: 1.5rem; }
 .page-title { font-size: 20px; font-weight: 700; color: var(--text-1); }
 .page-sub   { font-size: 13px; color: var(--text-2); margin-top: 3px; }
@@ -339,6 +347,23 @@ tr:hover td { background: var(--bg); }
 .btn-like:hover { border-color: #f43f5e; color: #f43f5e; }
 .btn-like.liked { background: #fff1f2; border-color: #f43f5e; color: #f43f5e; }
 .btn-like i { font-size: 14px; }
+
+.resumo-comentarios-toggle {
+  display: flex; align-items: center; gap: 6px; margin-top: 10px;
+  font-size: 12px; font-weight: 600; color: var(--text-2); cursor: pointer; user-select: none;
+}
+.resumo-comentarios-toggle:hover { color: var(--primary, #1a56db); }
+.resumo-comentarios {
+  margin-top: 8px; padding-top: 10px; border-top: 1px solid var(--border-soft);
+}
+.comentarios-lista { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; max-height: 220px; overflow-y: auto; }
+.comentario-item { background: var(--bg); border-radius: 8px; padding: 7px 10px; }
+.comentario-head { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
+.comentario-autor { font-size: 12px; font-weight: 600; color: var(--text-1); }
+.comentario-data { font-size: 11px; color: var(--text-3); }
+.comentario-corpo { font-size: 12.5px; color: var(--text-2); line-height: 1.5; }
+.comentario-form { display: flex; gap: 6px; }
+.comentario-form .inp { flex: 1; }
 
 /* ─── PROVAS ─────────────────────────────────────────────── */
 .prova-item {
@@ -606,151 +631,12 @@ body.dark .aula-qui,.dark .aula-ed,.dark .aula-fil,.dark .aula-ing,.dark .aula-a
   display: flex; align-items: center; justify-content: center; z-index: 200;
 }
 .loading-overlay.hidden { display: none; }
-/* ── CARDS DE ATUALIZAÇÃO ──────────────────────────────── */
-.upd-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 1.25rem 1.5rem;
-  max-width: 640px; margin-bottom: 1rem;
-  border-left: 4px solid var(--primary);
-  transition: box-shadow .15s;
-}
-.upd-card:hover { box-shadow: var(--shadow-md); }
-.upd-card.tipo-novidade  { border-left-color: #8b5cf6; }
-.upd-card.tipo-melhoria  { border-left-color: #0891b2; }
-.upd-card.tipo-correcao  { border-left-color: #f59e0b; }
-.upd-card.tipo-aviso     { border-left-color: #ef4444; }
-.upd-head { display:flex; align-items:center; gap:10px; margin-bottom:.5rem; flex-wrap:wrap; }
-.upd-titulo { font-size:15px; font-weight:700; color:var(--text-1); flex:1; }
-.upd-badge { font-size:11px; font-weight:600; padding:3px 8px; border-radius:20px; }
-.upd-badge.tipo-novidade { background:#ede9fe; color:#6d28d9; }
-.upd-badge.tipo-melhoria { background:#cffafe; color:#0e7490; }
-.upd-badge.tipo-correcao { background:#fef3c7; color:#92400e; }
-.upd-badge.tipo-aviso    { background:#fee2e2; color:#b91c1c; }
-.upd-versao { font-size:11px; color:var(--text-3); background:var(--bg); padding:2px 8px; border-radius:20px; border:1px solid var(--border); }
-.upd-corpo { font-size:13.5px; color:var(--text-2); line-height:1.65; white-space:pre-wrap; }
-.upd-meta  { font-size:11px; color:var(--text-3); margin-top:.75rem; display:flex; align-items:center; gap:6px; }
-/* ── BUG CARDS ────────────────────────────────────────────── */
-.bug-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 1rem 1.25rem;
-  margin-bottom: .75rem; border-left: 4px solid var(--border);
-}
-.bug-card.prio-critico { border-left-color: #ef4444; }
-.bug-card.prio-alto    { border-left-color: #f97316; }
-.bug-card.prio-medio   { border-left-color: #f59e0b; }
-.bug-card.prio-baixo   { border-left-color: #10b981; }
-.bug-card.status-resolvido { opacity: .6; }
-.bug-head { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:.5rem; }
-.bug-titulo-text { font-size:14px; font-weight:700; color:var(--text-1); flex:1; }
-.bug-badge-prio  { font-size:11px; font-weight:600; padding:2px 7px; border-radius:20px; }
-.bug-badge-prio.critico { background:#fee2e2; color:#b91c1c; }
-.bug-badge-prio.alto    { background:#ffedd5; color:#c2410c; }
-.bug-badge-prio.medio   { background:#fef3c7; color:#92400e; }
-.bug-badge-prio.baixo   { background:#d1fae5; color:#065f46; }
-.bug-status-select { font-size:12px; padding:3px 6px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:var(--text-1); cursor:pointer; }
-.inp-label { display:block; font-size:12px; font-weight:600; color:var(--text-2); text-transform:uppercase; letter-spacing:.04em; margin-bottom:5px; }
-
-/* ─── MOBILE TOPBAR ──────────────────────────────────────── */
-.mobile-topbar {
-  display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 150;
-  height: 52px; background: var(--surface); border-bottom: 1px solid var(--border);
-  align-items: center; padding: 0 1rem; gap: 10px;
-  box-shadow: 0 1px 8px rgba(0,0,0,.12);
-}
-.mobile-topbar .mt-brand { font-size: 15px; font-weight: 600; color: var(--text-1); flex: 1; }
-.btn-hamburger {
-  background: none; border: none; padding: 6px; cursor: pointer;
-  color: var(--text-1); display: flex; align-items: center;
-  border-radius: 6px; transition: background .15s;
-}
-.btn-hamburger:hover { background: var(--bg); }
-.btn-hamburger i { font-size: 22px; }
-.sidebar-overlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,.5); z-index: 99;
-  opacity: 0; transition: opacity .25s; pointer-events: none;
-}
-.sidebar-overlay.visible { opacity: 1; pointer-events: auto; }
-
-/* ─── RESPONSIVE ─────────────────────────────────────────── */
-@media (max-width: 768px) {
-  .mobile-topbar { display: flex; }
-  .sidebar-overlay { display: block; }
-
-  .sidebar {
-    transform: translateX(-100%);
-    transition: transform .28s cubic-bezier(.4,0,.2,1);
-    z-index: 200; box-shadow: none;
-  }
-  .sidebar.open {
-    transform: translateX(0);
-    box-shadow: 4px 0 32px rgba(0,0,0,.25);
-  }
-
-  .main-content {
-    margin-left: 0 !important;
-    max-width: 100vw !important;
-    padding: 1rem;
-    padding-top: calc(52px + 1rem);
-    box-sizing: border-box;
-    width: 100%;
-    overflow-x: hidden;
-  }
-
-  .card { overflow-x: auto; }
-  table { min-width: 480px; }
-  .stats-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (max-width: 400px) {
-  .stats-grid { grid-template-columns: 1fr 1fr; }
-  .page-title { font-size: 17px; }
-}
-/* ── SKELETON LOADING ────────────────────────────────────── */
-.skeleton {
-  background: linear-gradient(90deg, var(--border) 25%, var(--bg) 50%, var(--border) 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.4s infinite;
-  border-radius: 6px;
-}
-@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-.sk-line  { height: 14px; margin-bottom: 8px; }
-.sk-title { height: 20px; width: 55%; margin-bottom: 12px; }
-.sk-card  {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: .75rem;
-}
-.sk-avatar { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; }
-.sk-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-
-/* ── OFFLINE BANNER ──────────────────────────────────────── */
-#offline-banner {
-  display: none; position: fixed; bottom: 1rem; left: 50%; transform: translateX(-50%);
-  background: #1f2937; color: #fff; padding: 10px 20px; border-radius: 30px;
-  font-size: 13px; font-weight: 600; z-index: 9999;
-  box-shadow: 0 4px 20px rgba(0,0,0,.3);
-  display: flex; align-items: center; gap: 8px;
-  opacity: 0; pointer-events: none;
-  transition: opacity .3s;
-}
-#offline-banner.visible { opacity: 1; pointer-events: auto; }
-#offline-banner.online  { background: #065f46; }
 </style>
 </head>
 <body>
 
 <div id="toast"></div>
-<div id="offline-banner"><i class="ti ti-wifi-off"></i> <span id="offline-text">Sem conexão</span></div>
 <div class="loading-overlay hidden" id="loading"><div class="spinner" style="border-color:rgba(26,86,219,.2);border-top-color:var(--primary);width:36px;height:36px;border-width:3px"></div></div>
-
-<!-- overlay + topbar mobile -->
-<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
-<div class="mobile-topbar" id="mobile-topbar">
-  <button class="btn-hamburger" onclick="toggleSidebar()" aria-label="Menu">
-    <i class="ti ti-menu-2" id="hamburger-icon"></i>
-  </button>
-  <div class="mt-brand">Central da Turma</div>
-</div>
 
 <!-- ═══════════════════════════════════════
      LOGIN
@@ -800,30 +686,16 @@ body.dark .aula-qui,.dark .aula-ed,.dark .aula-fil,.dark .aula-ing,.dark .aula-a
         </div>
         <div class="sb-user">
           <div class="sb-avatar" id="sb-avatar">--</div>
-          <div style="flex:1;min-width:0">
+          <div>
             <div class="sb-uname" id="sb-name">Carregando...</div>
             <div class="sb-urole" id="sb-role">—</div>
-          </div>
-          <!-- sininho -->
-          <div style="position:relative;flex-shrink:0">
-            <button id="notif-btn" onclick="toggleNotifPanel()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:4px;border-radius:6px;display:flex;align-items:center">
-              <i class="ti ti-bell" style="font-size:19px"></i>
-              <span id="notif-badge" style="display:none;position:absolute;top:0;right:0;background:#ef4444;color:#fff;font-size:9px;font-weight:700;min-width:14px;height:14px;border-radius:8px;align-items:center;justify-content:center;padding:0 2px"></span>
-            </button>
-            <div id="notif-panel" style="display:none;position:absolute;right:-8px;top:36px;width:290px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-md);z-index:500;max-height:360px;overflow-y:auto">
-              <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem 1rem;border-bottom:1px solid var(--border)">
-                <span style="font-weight:700;font-size:13px;color:var(--text-1)">Notificações</span>
-                <button onclick="lerTodasNotif()" style="background:none;border:none;cursor:pointer;font-size:11px;color:var(--primary)">Marcar lidas</button>
-              </div>
-              <div id="notif-list"><div style="padding:1rem;font-size:13px;color:var(--text-3)">Sem notificações.</div></div>
-            </div>
           </div>
         </div>
       </div>
 
       <nav class="sb-nav">
         <div class="nav-section">Estudos</div>
-        <div class="nav-item active" onclick="navTo('inicio',this)"><i class="ti ti-home"></i> Início</div>
+        <div class="nav-item active" onclick="navTo('inicio',this)"><i class="ti ti-home"></i> Início <span class="nav-badge hidden" id="badge-avisos-nav">0</span></div>
         <div class="nav-item" onclick="navTo('horarios',this)"><i class="ti ti-clock"></i> Horários</div>
         <div class="nav-item" onclick="navTo('materiais',this)"><i class="ti ti-files"></i> Materiais</div>
         <div class="nav-item" onclick="navTo('resumos',this)"><i class="ti ti-notes"></i> Resumos</div>
@@ -832,14 +704,10 @@ body.dark .aula-qui,.dark .aula-ed,.dark .aula-fil,.dark .aula-ing,.dark .aula-a
         <div class="nav-section">Turma</div>
         <div class="nav-item" onclick="navTo('lideranca',this)"><i class="ti ti-shield-star"></i> Liderança</div>
         <div class="nav-item" onclick="navTo('creditos',this)"><i class="ti ti-award"></i> Créditos</div>
-        <div class="nav-item" onclick="navTo('atualizacoes',this)"><i class="ti ti-speakerphone"></i> Últimas atualizações</div>
         <div class="nav-section hidden" id="nav-admin-section">Administração</div>
         <div class="nav-item hidden" id="nav-admin" onclick="navTo('admin',this)"><i class="ti ti-settings-2"></i> Painel Admin</div>
         <div class="nav-item hidden" id="nav-criar-conta" onclick="navTo('criar-conta',this)"><i class="ti ti-user-plus"></i> Criar conta</div>
-        <div class="nav-item" id="nav-report-bug" onclick="navTo('report-bug',this)"><i class="ti ti-bug"></i> Reportar bug</div>
-        <div class="nav-item hidden" id="nav-bugs-reportados" onclick="navTo('bugs-reportados',this)"><i class="ti ti-bug-off"></i> Bugs reportados</div>
         <div class="nav-section">Conta</div>
-        <div class="nav-item" onclick="navTo('perfil',this)"><i class="ti ti-user-circle"></i> Meu Perfil</div>
         <div class="nav-item" onclick="navTo('configuracoes',this)"><i class="ti ti-adjustments-horizontal"></i> Configurações</div>
       </nav>
 
@@ -889,10 +757,13 @@ body.dark .aula-qui,.dark .aula-ed,.dark .aula-fil,.dark .aula-ing,.dark .aula-a
         </div>
         <div class="card">
           <div class="card-header">
-            <span class="ch-title">Avisos da turma</span>
-            <button class="btn-primary hidden" id="btn-novo-aviso" onclick="navTo('admin', document.getElementById('nav-admin'))">
-              <i class="ti ti-plus"></i> Novo aviso
-            </button>
+            <span class="ch-title">Avisos da turma <span class="nav-badge hidden" id="badge-avisos-card">0</span></span>
+            <div style="display:flex;gap:8px;align-items:center">
+              <button class="btn-secondary hidden" id="btn-marcar-todos-lidos" style="font-size:12px;padding:5px 10px" onclick="marcarTodosAvisosLidos()">Marcar todos como lidos</button>
+              <button class="btn-primary hidden" id="btn-novo-aviso" onclick="navTo('admin', document.getElementById('nav-admin'))">
+                <i class="ti ti-plus"></i> Novo aviso
+              </button>
+            </div>
           </div>
           <div class="card-body" id="avisos-list">
             <div style="color:var(--text-3);font-size:13px">Carregando avisos...</div>
@@ -906,16 +777,7 @@ body.dark .aula-qui,.dark .aula-ed,.dark .aula-fil,.dark .aula-ing,.dark .aula-a
           <div class="page-title">Horários das aulas</div>
           <div class="page-sub">Grade semanal — 7º Ano · 2026</div>
         </div>
-
-        <!-- botão editar (só lider/ajudante_dev/dev) -->
-        <div id="btn-editar-horario-wrap" class="hidden" style="margin-bottom:1rem">
-          <button class="btn-secondary" id="btn-editar-horario" onclick="toggleEditorHorario()">
-            <i class="ti ti-pencil"></i> Editar horários
-          </button>
-        </div>
-
-        <!-- grade visual (modo leitura) -->
-        <div class="card" id="horario-view">
+        <div class="card">
           <div class="card-body" style="padding:1rem">
             <div class="schedule-wrap">
               <div class="schedule-grid" id="schedule-grid">
@@ -925,23 +787,49 @@ body.dark .aula-qui,.dark .aula-ed,.dark .aula-fil,.dark .aula-ing,.dark .aula-a
                 <div class="sc-cell sc-header">Quarta</div>
                 <div class="sc-cell sc-header">Quinta</div>
                 <div class="sc-cell sc-header">Sexta</div>
+                <div class="sc-cell sc-time">7h00–7h50</div>
+                <div class="sc-cell sc-aula aula-mat">Matemática</div>
+                <div class="sc-cell sc-aula aula-port">Português</div>
+                <div class="sc-cell sc-aula aula-cie">Ciências</div>
+                <div class="sc-cell sc-aula aula-hist">História</div>
+                <div class="sc-cell sc-aula aula-geo">Geografia</div>
+                <div class="sc-cell sc-time">7h50–8h40</div>
+                <div class="sc-cell sc-aula aula-port">Português</div>
+                <div class="sc-cell sc-aula aula-ing">Inglês</div>
+                <div class="sc-cell sc-aula aula-mat">Matemática</div>
+                <div class="sc-cell sc-aula aula-cie">Ciências</div>
+                <div class="sc-cell sc-aula aula-ed">Ed. Física</div>
+                <div class="sc-cell sc-time">8h40–9h30</div>
+                <div class="sc-cell sc-aula aula-hist">História</div>
+                <div class="sc-cell sc-aula aula-mat">Matemática</div>
+                <div class="sc-cell sc-aula aula-geo">Geografia</div>
+                <div class="sc-cell sc-aula aula-port">Português</div>
+                <div class="sc-cell sc-aula aula-art">Artes</div>
+                <div class="sc-cell sc-time">9h30–9h50</div>
+                <div class="sc-cell sc-break">— intervalo —</div>
+                <div class="sc-cell sc-time">9h50–10h40</div>
+                <div class="sc-cell sc-aula aula-geo">Geografia</div>
+                <div class="sc-cell sc-aula aula-cie">Ciências</div>
+                <div class="sc-cell sc-aula aula-port">Português</div>
+                <div class="sc-cell sc-aula aula-mat">Matemática</div>
+                <div class="sc-cell sc-aula aula-hist">História</div>
+                <div class="sc-cell sc-time">10h40–11h30</div>
+                <div class="sc-cell sc-aula aula-ed">Ed. Física</div>
+                <div class="sc-cell sc-aula aula-art">Artes</div>
+                <div class="sc-cell sc-aula aula-ing">Inglês</div>
+                <div class="sc-cell sc-aula aula-geo">Geografia</div>
+                <div class="sc-cell sc-aula aula-mat">Matemática</div>
               </div>
             </div>
-            <div class="legend-chips" id="horario-legend"></div>
-          </div>
-        </div>
-
-        <!-- editor (só aparece pra quem pode editar) -->
-        <div class="card hidden" id="horario-editor" style="margin-top:1rem;max-width:700px">
-          <div class="card-header"><span class="ch-title"><i class="ti ti-table"></i> Editar grade</span></div>
-          <div class="card-body">
-            <div style="font-size:12px;color:var(--text-3);margin-bottom:1rem">
-              Clique em qualquer célula para editar a disciplina. Linhas marcadas como "Intervalo" ficam mescladas.
-            </div>
-            <div id="horario-editor-grid" style="display:grid;grid-template-columns:140px repeat(5,1fr);gap:4px;margin-bottom:1rem"></div>
-            <div style="display:flex;gap:8px">
-              <button class="btn-primary" onclick="salvarHorario()"><i class="ti ti-device-floppy"></i> Salvar</button>
-              <button class="btn-secondary" onclick="toggleEditorHorario()">Cancelar</button>
+            <div class="legend-chips">
+              <span class="tag tag-blue">Matemática</span>
+              <span class="tag tag-purple">Português</span>
+              <span class="tag tag-green">Ciências</span>
+              <span class="tag tag-orange">História</span>
+              <span class="tag tag-teal">Geografia</span>
+              <span class="tag tag-sky">Ed. Física</span>
+              <span class="tag tag-amber">Artes</span>
+              <span class="tag" style="background:#f5f3ff;color:#3730a3">Inglês</span>
             </div>
           </div>
         </div>
@@ -990,6 +878,13 @@ body.dark .aula-qui,.dark .aula-ed,.dark .aula-fil,.dark .aula-ing,.dark .aula-a
             <button class="btn-primary" onclick="publicarResumo()"><i class="ti ti-send"></i> Publicar</button>
           </div>
         </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem" id="res-filters">
+          <button class="btn-secondary active-filter" onclick="filtrarRes('', this)" style="font-size:12px;padding:5px 12px">Todos</button>
+          <button class="btn-secondary" onclick="filtrarRes('Matemática', this)" style="font-size:12px;padding:5px 12px">Matemática</button>
+          <button class="btn-secondary" onclick="filtrarRes('Ciências', this)" style="font-size:12px;padding:5px 12px">Ciências</button>
+          <button class="btn-secondary" onclick="filtrarRes('História', this)" style="font-size:12px;padding:5px 12px">História</button>
+          <button class="btn-secondary" onclick="filtrarRes('Português', this)" style="font-size:12px;padding:5px 12px">Português</button>
+        </div>
         <div id="resumos-list">
           <div style="color:var(--text-3);font-size:13px">Carregando resumos...</div>
         </div>
@@ -1014,6 +909,13 @@ body.dark .aula-qui,.dark .aula-ed,.dark .aula-fil,.dark .aula-ing,.dark .aula-a
             </div>
             <button class="btn-primary" onclick="adicionarProva()"><i class="ti ti-plus"></i> Adicionar</button>
           </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem" id="prov-filters">
+          <button class="btn-secondary active-filter" onclick="filtrarProv('', this)" style="font-size:12px;padding:5px 12px">Todos</button>
+          <button class="btn-secondary" onclick="filtrarProv('Matemática', this)" style="font-size:12px;padding:5px 12px">Matemática</button>
+          <button class="btn-secondary" onclick="filtrarProv('Ciências', this)" style="font-size:12px;padding:5px 12px">Ciências</button>
+          <button class="btn-secondary" onclick="filtrarProv('História', this)" style="font-size:12px;padding:5px 12px">História</button>
+          <button class="btn-secondary" onclick="filtrarProv('Português', this)" style="font-size:12px;padding:5px 12px">Português</button>
         </div>
         <div id="provas-list">
           <div style="color:var(--text-3);font-size:13px">Carregando provas...</div>
@@ -1177,53 +1079,6 @@ body.dark .aula-qui,.dark .aula-ed,.dark .aula-fil,.dark .aula-ing,.dark .aula-a
           <div class="stat-card"><div class="sc-label">Provas</div><div class="sc-val" id="adm-stat-prov">—</div></div>
           <div class="stat-card"><div class="sc-label">Avisos</div><div class="sc-val" id="adm-stat-avis">—</div></div>
         </div>
-
-        <!-- ── SEÇÃO SOMENTE DEV ─────────────────── -->
-        <div id="admin-dev-section" class="hidden">
-
-          <!-- Quem está online -->
-          <div class="section-title" style="margin-top:1.5rem">
-            <span style="display:inline-flex;align-items:center;gap:6px">
-              <span style="width:8px;height:8px;border-radius:50%;background:#10b981;display:inline-block;box-shadow:0 0 0 2px #d1fae5"></span>
-              Online agora
-            </span>
-            <button class="btn-secondary" style="float:right;font-size:12px;padding:4px 10px" onclick="carregarOnline()"><i class="ti ti-refresh"></i></button>
-          </div>
-          <div class="card">
-            <div id="admin-online-list" style="padding:1rem;color:var(--text-3);font-size:13px">Carregando...</div>
-          </div>
-
-          <!-- Último login de cada conta -->
-          <div class="section-title" style="margin-top:1.5rem">Último login por conta</div>
-          <div class="card">
-            <table>
-              <thead><tr><th>Membro</th><th>Cargo</th><th>Último login</th><th>Status</th></tr></thead>
-              <tbody id="admin-logins-tbody"><tr><td colspan="4" style="color:var(--text-3)">Carregando...</td></tr></tbody>
-            </table>
-          </div>
-
-          <!-- Logs de atividade -->
-          <div class="section-title" style="margin-top:1.5rem">
-            Log de atividades
-            <div style="float:right;display:flex;gap:6px">
-              <select class="inp" id="log-filtro" style="font-size:12px;padding:4px 8px;height:30px" onchange="carregarLogs()">
-                <option value="">Todas as ações</option>
-                <option value="resumo">Resumos</option>
-                <option value="aviso">Avisos</option>
-                <option value="material">Materiais</option>
-                <option value="prova">Provas</option>
-                <option value="evento">Eventos</option>
-              </select>
-              <button class="btn-secondary" style="font-size:12px;padding:4px 10px" onclick="carregarLogs()"><i class="ti ti-refresh"></i></button>
-            </div>
-          </div>
-          <div class="card">
-            <div id="admin-logs-list" style="padding:0">
-              <div style="padding:1rem;color:var(--text-3);font-size:13px">Carregando logs...</div>
-            </div>
-          </div>
-
-        </div>
       </div>
 
       <!-- ── CRIAR CONTA (somente dev) ─────────── -->
@@ -1266,207 +1121,6 @@ body.dark .aula-qui,.dark .aula-ed,.dark .aula-fil,.dark .aula-ing,.dark .aula-a
         </div>
       </div>
 
-      <!-- ── REPORTAR BUG ───────────────────────────────── -->
-      <div class="page" id="page-report-bug">
-        <div class="page-header">
-          <div class="page-title"><i class="ti ti-bug" style="color:#ef4444"></i> Reportar bug</div>
-          <div class="page-sub">Encontrou algo errado? Nos avise!</div>
-        </div>
-        <div class="card" style="max-width:560px">
-          <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
-            <div>
-              <label class="inp-label">Título do bug <span style="color:#ef4444">*</span></label>
-              <input class="inp" id="bug-titulo" placeholder="Ex: Botão de curtir não funciona no celular" maxlength="120" />
-            </div>
-            <div>
-              <label class="inp-label">Em qual página acontece?</label>
-              <select class="inp" id="bug-pagina">
-                <option value="">Não sei / geral</option>
-                <option value="Avisos">Avisos</option>
-                <option value="Resumos">Resumos</option>
-                <option value="Materiais">Materiais</option>
-                <option value="Provas">Provas</option>
-                <option value="Eventos">Eventos</option>
-                <option value="Meu Perfil">Meu Perfil</option>
-                <option value="Liderança">Liderança</option>
-                <option value="Painel Admin">Painel Admin</option>
-                <option value="Últimas Atualizações">Últimas Atualizações</option>
-                <option value="Login">Login</option>
-                <option value="Outro">Outro</option>
-              </select>
-            </div>
-            <div>
-              <label class="inp-label">Prioridade</label>
-              <select class="inp" id="bug-prioridade">
-                <option value="baixo">🟢 Baixo — visual ou detalhe pequeno</option>
-                <option value="medio" selected>🟡 Médio — atrapalha mas dá pra usar</option>
-                <option value="alto">🟠 Alto — dificulta muito o uso</option>
-                <option value="critico">🔴 Crítico — impede de usar o sistema</option>
-              </select>
-            </div>
-            <div>
-              <label class="inp-label">Descrição detalhada <span style="color:#ef4444">*</span></label>
-              <textarea class="inp" id="bug-descricao" rows="4" maxlength="1000"
-                placeholder="Descreva o que aconteceu, o que você esperava, e como reproduzir o bug..."></textarea>
-            </div>
-            <div style="display:flex;justify-content:flex-end">
-              <button class="btn-primary" onclick="reportarBug()" style="background:#ef4444;border-color:#ef4444">
-                <i class="ti ti-send"></i> Enviar report
-              </button>
-            </div>
-          </div>
-        </div>
-        <!-- confirmação enviada -->
-        <div id="bug-enviado" class="card hidden" style="max-width:560px;margin-top:1rem;border-left:4px solid #10b981">
-          <div class="card-body" style="display:flex;align-items:center;gap:12px;color:#065f46">
-            <i class="ti ti-circle-check" style="font-size:24px;color:#10b981"></i>
-            <div>
-              <div style="font-weight:700">Bug enviado com sucesso!</div>
-              <div style="font-size:13px;color:var(--text-2)">Nossa equipe vai analisar em breve. Obrigado!</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── BUGS REPORTADOS (dev + ajudante_dev) ──────── -->
-      <div class="page" id="page-bugs-reportados">
-        <div class="page-header">
-          <div class="page-title"><i class="ti ti-bug-off" style="color:#f59e0b"></i> Bugs reportados</div>
-          <div class="page-sub">Gerencie os bugs enviados pela turma</div>
-        </div>
-
-        <!-- filtros -->
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem;max-width:700px">
-          <select class="inp" id="bugs-filtro-status" style="width:160px;font-size:13px" onchange="carregarBugs()">
-            <option value="">Todos os status</option>
-            <option value="aberto">Aberto</option>
-            <option value="em_analise">Em análise</option>
-            <option value="resolvido">Resolvido</option>
-            <option value="ignorado">Ignorado</option>
-          </select>
-          <select class="inp" id="bugs-filtro-prioridade" style="width:160px;font-size:13px" onchange="carregarBugs()">
-            <option value="">Todas as prioridades</option>
-            <option value="critico">🔴 Crítico</option>
-            <option value="alto">🟠 Alto</option>
-            <option value="medio">🟡 Médio</option>
-            <option value="baixo">🟢 Baixo</option>
-          </select>
-          <button class="btn-secondary" style="font-size:13px" onclick="carregarBugs()"><i class="ti ti-refresh"></i> Atualizar</button>
-        </div>
-
-        <div id="bugs-lista" style="max-width:700px">
-          <div style="color:var(--text-3);font-size:13px">Carregando...</div>
-        </div>
-      </div>
-
-      <!-- ── ÚLTIMAS ATUALIZAÇÕES ──────────────────── -->
-      <div class="page" id="page-atualizacoes">
-        <div class="page-header">
-          <div class="page-title">Últimas atualizações</div>
-          <div class="page-sub">Novidades e mudanças do sistema</div>
-        </div>
-
-        <!-- form somente dev -->
-        <div id="form-atualizacao" class="card hidden" style="max-width:560px;margin-bottom:1.5rem">
-          <div class="card-header"><span class="ch-title"><i class="ti ti-plus"></i> Nova atualização</span></div>
-          <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
-            <input class="inp" id="upd-titulo" placeholder="Título (ex: v1.2 — Perfis de usuário)" />
-            <div style="display:flex;gap:8px">
-              <select class="inp" id="upd-tipo" style="width:180px">
-                <option value="novidade">✨ Novidade</option>
-                <option value="melhoria">🔧 Melhoria</option>
-                <option value="correcao">🐛 Correção</option>
-                <option value="aviso">📢 Aviso</option>
-              </select>
-              <input class="inp" id="upd-versao" placeholder="Versão (ex: 1.2.0)" style="width:130px" />
-            </div>
-            <textarea class="inp" id="upd-corpo" rows="4" placeholder="Descreva o que mudou..."></textarea>
-            <div style="display:flex;gap:8px">
-              <button class="btn-primary" onclick="publicarAtualizacao()"><i class="ti ti-send"></i> Publicar</button>
-              <button class="btn-secondary" onclick="document.getElementById('form-atualizacao').classList.add('hidden')">Cancelar</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- botão abrir form (só dev) -->
-        <div id="btn-nova-atualizacao-wrap" class="hidden" style="margin-bottom:1rem">
-          <button class="btn-primary" onclick="document.getElementById('form-atualizacao').classList.toggle('hidden')">
-            <i class="ti ti-plus"></i> Nova atualização
-          </button>
-        </div>
-
-        <!-- lista de atualizações -->
-        <div id="atualizacoes-list">
-          <div style="color:var(--text-3);font-size:13px">Carregando...</div>
-        </div>
-      </div>
-
-      <!-- ── PERFIL ──────────────────────────────────── -->
-      <div class="page" id="page-perfil">
-        <div class="page-header">
-          <div class="page-title">Meu Perfil</div>
-          <div class="page-sub">Visível para todos da turma</div>
-        </div>
-
-        <!-- card de perfil -->
-        <div class="card" style="max-width:520px">
-          <div class="card-body" style="display:flex;flex-direction:column;align-items:center;gap:16px;padding:2rem 1.5rem">
-            <!-- avatar -->
-            <div style="position:relative">
-              <div id="perfil-avatar-img" style="width:96px;height:96px;border-radius:50%;overflow:hidden;background:var(--bg);border:3px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;color:var(--primary)">
-                <span id="perfil-avatar-iniciais"></span>
-              </div>
-              <label for="avatar-input" style="position:absolute;bottom:0;right:0;background:var(--primary);color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px">
-                <i class="ti ti-camera"></i>
-              </label>
-              <input type="file" id="avatar-input" accept="image/*" style="display:none" onchange="uploadAvatar(this)">
-            </div>
-            <!-- nome e usuario -->
-            <div style="text-align:center">
-              <div style="font-size:20px;font-weight:700;color:var(--text-1)" id="perfil-nome">—</div>
-              <div style="font-size:14px;color:var(--text-3);margin-top:2px" id="perfil-usuario">@—</div>
-              <span class="tag" id="perfil-cargo" style="margin-top:8px;display:inline-block">—</span>
-            </div>
-            <!-- bio -->
-            <div style="width:100%">
-              <label style="font-size:12px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.04em">Bio</label>
-              <textarea id="perfil-bio" class="inp" rows="3" maxlength="300" placeholder="Escreva algo sobre você..." style="margin-top:6px;resize:vertical"></textarea>
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-                <span style="font-size:11px;color:var(--text-3)" id="perfil-bio-count">0/300</span>
-                <button class="btn-primary" style="font-size:13px;padding:6px 16px" onclick="salvarBio()"><i class="ti ti-check"></i> Salvar bio</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ver perfil de outro membro -->
-        <div class="section-title" style="margin-top:1.5rem">Ver perfil de membro</div>
-        <div class="card" style="max-width:520px">
-          <div class="card-body">
-            <div style="display:flex;gap:8px">
-              <select class="inp" id="perfil-select-membro" style="flex:1"></select>
-              <button class="btn-secondary" onclick="verPerfilMembro()"><i class="ti ti-eye"></i> Ver</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- modal perfil membro -->
-        <div id="perfil-membro-modal" style="display:none;margin-top:1rem">
-          <div class="card" style="max-width:520px">
-            <div class="card-body" style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:1.5rem">
-              <div id="pm-avatar" style="width:80px;height:80px;border-radius:50%;background:var(--bg);border:3px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:var(--primary)"></div>
-              <div style="text-align:center">
-                <div style="font-size:18px;font-weight:700;color:var(--text-1)" id="pm-nome">—</div>
-                <div style="font-size:13px;color:var(--text-3)" id="pm-usuario">@—</div>
-                <span class="tag" id="pm-cargo" style="margin-top:6px;display:inline-block">—</span>
-              </div>
-              <div id="pm-bio" style="font-size:14px;color:var(--text-2);text-align:center;font-style:italic;max-width:360px"></div>
-              <div style="font-size:12px;color:var(--text-3)" id="pm-desde"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- ── CONFIGURAÇÕES ───────────────────── -->
       <div class="page" id="page-configuracoes">
         <div class="page-header">
@@ -1499,6 +1153,21 @@ body.dark .aula-qui,.dark .aula-ed,.dark .aula-fil,.dark .aula-ing,.dark .aula-a
             <span class="tag" id="cfg-cargo">—</span>
           </div>
         </div>
+
+        <div class="config-section">
+          <h3>Trocar senha</h3>
+          <div class="form-row form-row-2">
+            <div>
+              <label style="display:block;font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em">Senha atual</label>
+              <input class="inp" type="password" id="senha-atual" placeholder="Sua senha atual" />
+            </div>
+            <div>
+              <label style="display:block;font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em">Nova senha</label>
+              <input class="inp" type="password" id="senha-nova" placeholder="Mínimo 6 caracteres" />
+            </div>
+          </div>
+          <button class="btn-primary" style="margin-top:10px" onclick="trocarSenha()"><i class="ti ti-key"></i> Salvar nova senha</button>
+        </div>
       </div>
 
     </main>
@@ -1510,7 +1179,7 @@ body.dark .aula-qui,.dark .aula-ed,.dark .aula-fil,.dark .aula-ing,.dark .aula-a
 ════════════════════════════════════════ -->
 <script>
 /* ── CONFIG ──────────────────────────────────────────────── */
-const BASE_URL = "https://back-end-cetuba-production.up.railway.app";  
+const BASE_URL = 'http://localhost:3000';
 
 let token = sessionStorage.getItem('ct_token') || null;
 let currentUser = null;
@@ -1525,11 +1194,11 @@ const NIVEL_CARGO = {
 };
 
 const NOME_CARGO = {
-  dev:           '👨‍💻 Desenvolvedor',
-  ajudante_dev:  '🛠️ Ajudante de Desenvolvimento',
-  lider:         '👑 Líder da Sala',
-  sub_lider:     '⭐ Vice-líder da Sala',
-  aluno:         '📚 Aluno',
+  dev:           'Desenvolvedor',
+  ajudante_dev:  'Ajudante de Desenvolvimento',
+  lider:         'Líder da Sala',
+  sub_lider:     'Vice-líder da Sala',
+  aluno:         'Aluno',
 };
 
 const TAG_CARGO = {
@@ -1544,6 +1213,22 @@ function nivelUsuario() {
   return NIVEL_CARGO[currentUser?.role] || 0;
 }
 
+/* ── Sanitização ────────────────────────────────────────────
+   Escapa qualquer texto vindo do usuário/banco antes de ser
+   inserido via innerHTML, prevenindo XSS armazenado (ex: um
+   aviso ou resumo com <script> no título/corpo). Sempre usar
+   em textos dinâmicos; não usar em HTML que a própria página
+   monta (ícones, classes etc). */
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 // Vice-líder pra cima pode editar
 function podeEditar() { return nivelUsuario() >= 2; }
 // Líder pra cima pode gerenciar membros
@@ -1556,7 +1241,7 @@ async function apiFetch(endpoint, opts = {}) {
   const headers = { 'Content-Type': 'application/json', ...opts.headers };
   if (token) headers['Authorization'] = `Bearer ${token}`;
   const res = await fetch(BASE_URL + endpoint, { ...opts, headers });
-  if (res.status === 401) { doLogout(false); throw new Error('Sessão expirada'); }
+  if (res.status === 401) { doLogout(); throw new Error('Sessão expirada'); }
   if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.message || 'Erro na requisição'); }
   return res.json();
 }
@@ -1608,14 +1293,13 @@ async function doLogin() {
   }
 }
 
-function doLogout(showToast = true) {
+function doLogout() {
   token = null; currentUser = null;
   sessionStorage.removeItem('ct_token');
   document.getElementById('app').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('inp-user').value = '';
   document.getElementById('inp-pass').value = '';
-  if (showToast) toast('Sessão encerrada.', 'default');
 }
 
 /* ── INIT APP ───────────────────────────────────────────── */
@@ -1645,19 +1329,6 @@ function initApp() {
   document.getElementById('nav-admin').classList.toggle('hidden', !showAdmin);
   document.getElementById('btn-novo-aviso').classList.toggle('hidden', !showAdmin);
   document.getElementById('nav-criar-conta').classList.toggle('hidden', !isDev());
-  // bugs-reportados só pra dev e ajudante_dev
-  const podeVerBugs = ['dev','ajudante_dev'].includes(currentUser.role);
-  document.getElementById('nav-bugs-reportados').classList.toggle('hidden', !podeVerBugs);
-  // report-bug visível pra todos (já está visível por padrão)
-  // garante que seção admin aparece mesmo só pra report-bug
-  if (!showAdmin) document.getElementById('nav-admin-section').classList.remove('hidden');
-
-  atualizarSidebarAvatar();
-  startHeartbeat();
-  if (isDev()) document.getElementById('btn-nova-atualizacao-wrap').classList.remove('hidden');
-  // notificações
-  carregarNotificacoes();
-  conectarSSE();
 
   // Elementos de edição aparecem para quem pode editar
   if (podeEditar()) {
@@ -1699,14 +1370,9 @@ function navTo(id, el) {
   if (pg) pg.classList.add('active');
   if (el) el.classList.add('active');
   // carrega dados específicos da aba
-  if (id === 'lideranca')    carregarLideranca();
-  if (id === 'creditos')     carregarCreditos();
+  if (id === 'lideranca') carregarLideranca();
+  if (id === 'creditos')  carregarCreditos();
   if (id === 'configuracoes') abrirConfiguracoes();
-  if (id === 'perfil')       abrirPerfil();
-  if (id === 'admin')        abrirAdmin();
-  if (id === 'atualizacoes')    carregarAtualizacoes();
-  if (id === 'bugs-reportados') carregarBugs();
-  if (id === 'horarios')        carregarHorarios();
 }
 
 /* ── CONFIGURAÇÕES ──────────────────────────────────────── */
@@ -1748,8 +1414,8 @@ function renderEventos(list, elId) {
     <div class="event-item ${evClasse[ev.tipo]||'ev-blue'}">
       <i class="ti ${evIcone[ev.tipo]||'ti-calendar'} ev-icon"></i>
       <div>
-        <div class="ev-title">${ev.titulo}</div>
-        <div class="ev-date">${formatData(ev.data)}${ev.descricao ? ' · ' + ev.descricao : ''}</div>
+        <div class="ev-title">${escapeHtml(ev.titulo)}</div>
+        <div class="ev-date">${formatData(ev.data)}${ev.descricao ? ' · ' + escapeHtml(ev.descricao) : ''}</div>
       </div>
       ${podeEditar() ? `<button class="btn-danger" style="margin-left:auto" onclick="deletarEvento(${ev.id})"><i class="ti ti-trash"></i></button>` : ''}
     </div>`).join('');
@@ -1784,23 +1450,51 @@ async function deletarEvento(id) {
 
 /* ── AVISOS ──────────────────────────────────────────────── */
 async function carregarAvisos() {
-  document.getElementById('avisos-list').innerHTML = skeletonCards(2);
   try {
     const avisos = await apiGet('/avisos');
     const canDelete = podeEditar();
     document.getElementById('avisos-list').innerHTML = avisos.length
       ? avisos.map(a => `
-          <div class="aviso-item">
+          <div class="aviso-item ${a.lido ? '' : 'nao-lido'}">
             <div style="display:flex;justify-content:space-between;align-items:flex-start">
-              <div class="aviso-title">${a.titulo}</div>
+              <div class="aviso-title">${escapeHtml(a.titulo)}</div>
               ${canDelete ? `<button class="btn-danger" style="margin-left:8px;flex-shrink:0" onclick="deletarAviso(${a.id})"><i class="ti ti-trash"></i></button>` : ''}
             </div>
-            <div class="aviso-body">${a.corpo}</div>
-            <div class="aviso-meta">${a.autor} · ${formatData(a.criadoEm)}</div>
+            <div class="aviso-body">${escapeHtml(a.corpo)}</div>
+            <div class="aviso-meta" style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+              <span>${escapeHtml(a.autor)} · ${formatData(a.criadoEm)}</span>
+              ${a.lido
+                ? '<span class="aviso-lido-tag"><i class="ti ti-check"></i> Lido</span>'
+                : `<button class="btn-marcar-lido" onclick="marcarAvisoLido(${a.id})">Marcar como lido</button>`}
+            </div>
           </div>`).join('')
       : '<div style="color:var(--text-3);font-size:13px">Nenhum aviso no momento.</div>';
     document.getElementById('adm-stat-avis').textContent = avisos.length;
+
+    const naoLidos = avisos.filter(a => !a.lido).length;
+    ['badge-avisos-nav', 'badge-avisos-card'].forEach(id => {
+      const el = document.getElementById(id);
+      el.textContent = naoLidos;
+      el.classList.toggle('hidden', naoLidos === 0);
+    });
+    document.getElementById('btn-marcar-todos-lidos').classList.toggle('hidden', naoLidos === 0);
   } catch(e) { console.error('Avisos:', e); }
+}
+
+async function marcarAvisoLido(id) {
+  try {
+    await apiPost(`/avisos/${id}/lido`);
+    await carregarAvisos();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function marcarTodosAvisosLidos() {
+  try {
+    const avisos = await apiGet('/avisos');
+    await Promise.all(avisos.filter(a => !a.lido).map(a => apiPost(`/avisos/${a.id}/lido`)));
+    await carregarAvisos();
+    toast('Todos os avisos marcados como lidos.', 'success');
+  } catch(e) { toast(e.message, 'error'); }
 }
 
 async function publicarAviso() {
@@ -1831,7 +1525,6 @@ async function deletarAviso(id) {
 let todosOsMateriais = [];
 
 async function carregarMateriais() {
-  document.getElementById('mat-list').innerHTML = skeletonCards(3);
   try {
     const data = await apiGet('/materiais');
     todosOsMateriais = data;
@@ -1852,12 +1545,11 @@ function renderMateriais(list) {
     <div class="mat-item">
       <div class="mat-icon mi-${m.tipo}"><i class="ti ${tipoIcon(m.tipo)}"></i></div>
       <div class="mat-info">
-        <div class="mat-name">${m.nome}</div>
-        <div class="mat-meta">${m.tipo.toUpperCase()} · ${tamanho} · ${m.enviadoPor||'—'} · ${formatData(m.criadoEm)}</div>
+        <div class="mat-name">${escapeHtml(m.nome)}</div>
+        <div class="mat-meta">${escapeHtml(m.tipo.toUpperCase())} · ${tamanho} · enviado por ${escapeHtml(m.enviadoPor||'—')} · ${formatData(m.criadoEm)}</div>
       </div>
-      <span class="tag ${discTag(m.disciplina)}" style="margin-right:8px;white-space:nowrap">${m.disciplina}</span>
-      <span style="font-size:11px;color:var(--text-3);margin-right:8px;white-space:nowrap"><i class="ti ti-download" style="font-size:11px"></i> ${m.downloads||0}</span>
-      <a href="${url}" target="_blank" class="btn-dl" onclick="registrarDownload(${m.id})"><i class="ti ti-download"></i> Baixar</a>
+      <span class="tag ${discTag(m.disciplina)}" style="margin-right:8px;white-space:nowrap">${escapeHtml(m.disciplina)}</span>
+      <a href="${url}" target="_blank" class="btn-dl"><i class="ti ti-download"></i> Baixar</a>
       ${podeEditar() ? `<button class="btn-danger" onclick="deletarMaterial(${m.id})"><i class="ti ti-trash"></i></button>` : ''}
     </div>`;
   }).join('');
@@ -1901,45 +1593,60 @@ async function deletarMaterial(id) {
 }
 
 /* ── RESUMOS ─────────────────────────────────────────────── */
+let todosOsResumos = [];
+
 async function carregarResumos() {
-  document.getElementById('resumos-list').innerHTML = skeletonCards(3, true);
   try {
     const data = await apiGet('/resumos');
-    const el = document.getElementById('resumos-list');
-    el.innerHTML = data.length ? data.map(r => `
+    todosOsResumos = data;
+    renderResumos(data);
+    document.getElementById('stat-resumos').textContent = data.length;
+    document.getElementById('adm-stat-res').textContent = data.length;
+  } catch(e) { console.error('Resumos:', e); }
+}
+
+function renderResumos(data) {
+  const el = document.getElementById('resumos-list');
+  el.innerHTML = data.length ? data.map(r => `
       <div class="resumo-card" id="resumo-${r.id}">
         <div class="resumo-head">
           <div>
-            <div class="resumo-titulo">${r.titulo}</div>
+            <div class="resumo-titulo">${escapeHtml(r.titulo)}</div>
             <div class="resumo-meta">
-              ${r.autorNome} · ${formatData(r.criadoEm)}
-              <span class="tag ${discTag(r.disciplina)}">${r.disciplina}</span>
+              ${escapeHtml(r.autorNome)} · ${formatData(r.criadoEm)}
+              <span class="tag ${discTag(r.disciplina)}">${escapeHtml(r.disciplina)}</span>
             </div>
           </div>
           <div style="display:flex;gap:6px;align-items:center">
             <button class="btn-like ${r.curtido ? 'liked' : ''}" onclick="curtirResumo(${r.id}, this)">
               <i class="ti ti-heart"></i> <span>${r.curtidas}</span>
             </button>
-            <button class="btn-secondary" style="font-size:12px;padding:5px 9px" onclick="toggleComentarios(${r.id})">
-              <i class="ti ti-message-circle"></i> <span id="coment-count-${r.id}">${r.totalComentarios||0}</span>
-            </button>
             ${podeEditar() ? `<button class="btn-danger" onclick="deletarResumo(${r.id})"><i class="ti ti-trash"></i></button>` : ''}
           </div>
         </div>
-        <div class="resumo-body">${r.corpo}</div>
-        <!-- seção de comentários (lazy) -->
-        <div id="comentarios-${r.id}" style="display:none;margin-top:1rem;border-top:1px solid var(--border);padding-top:.75rem">
-          <div id="coment-list-${r.id}" style="margin-bottom:.75rem"></div>
-          <div style="display:flex;gap:8px">
-            <input class="inp" id="coment-inp-${r.id}" placeholder="Escrever comentário..." maxlength="500" style="flex:1;font-size:13px"
-              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviarComentario(${r.id})}" />
-            <button class="btn-primary" style="padding:7px 12px" onclick="enviarComentario(${r.id})"><i class="ti ti-send"></i></button>
+        <div class="resumo-body">${escapeHtml(r.corpo)}</div>
+        <div class="resumo-comentarios-toggle" onclick="toggleComentarios(${r.id})">
+          <i class="ti ti-message-circle"></i> <span id="com-contador-${r.id}">Comentários</span>
+        </div>
+        <div class="resumo-comentarios hidden" id="comentarios-${r.id}">
+          <div class="comentarios-lista" id="comentarios-lista-${r.id}">
+            <div style="color:var(--text-3);font-size:12px">Carregando comentários...</div>
+          </div>
+          <div class="comentario-form">
+            <input class="inp" style="font-size:13px;padding:7px 10px" id="com-input-${r.id}"
+                   placeholder="Escreva um comentário..." onkeydown="if(event.key==='Enter') publicarComentario(${r.id})" />
+            <button class="btn-secondary" style="font-size:12px;padding:6px 10px" onclick="publicarComentario(${r.id})">
+              <i class="ti ti-send"></i>
+            </button>
           </div>
         </div>
-      </div>`).join('') : '<div style="color:var(--text-3);font-size:13px">Nenhum resumo ainda.</div>';
-    document.getElementById('stat-resumos').textContent = data.length;
-    document.getElementById('adm-stat-res').textContent = data.length;
-  } catch(e) { console.error('Resumos:', e); }
+      </div>`).join('') : '<div style="color:var(--text-3);font-size:13px">Nenhum resumo encontrado.</div>';
+}
+
+function filtrarRes(disc, btn) {
+  document.querySelectorAll('#res-filters button').forEach(b => b.classList.remove('active-filter'));
+  btn.classList.add('active-filter');
+  renderResumos(disc ? todosOsResumos.filter(r => r.disciplina === disc) : todosOsResumos);
 }
 
 async function publicarResumo() {
@@ -1975,13 +1682,83 @@ async function deletarResumo(id) {
   } catch(e) { toast(e.message, 'error'); }
 }
 
+/* ── COMENTÁRIOS NOS RESUMOS ─────────────────────────────── */
+const comentariosAbertos = new Set();
+
+async function toggleComentarios(resumoId) {
+  const painel = document.getElementById(`comentarios-${resumoId}`);
+  if (!painel) return;
+  const abrir = painel.classList.contains('hidden');
+  painel.classList.toggle('hidden');
+  if (abrir) {
+    comentariosAbertos.add(resumoId);
+    await carregarComentarios(resumoId);
+  } else {
+    comentariosAbertos.delete(resumoId);
+  }
+}
+
+async function carregarComentarios(resumoId) {
+  const lista = document.getElementById(`comentarios-lista-${resumoId}`);
+  try {
+    const data = await apiGet(`/resumos/${resumoId}/comentarios`);
+    const contador = document.getElementById(`com-contador-${resumoId}`);
+    if (contador) contador.textContent = data.length ? `${data.length} comentário${data.length > 1 ? 's' : ''}` : 'Comentar';
+    lista.innerHTML = data.length ? data.map(c => `
+      <div class="comentario-item">
+        <div class="comentario-head">
+          <span class="comentario-autor">${escapeHtml(c.autorNome)}</span>
+          <span class="comentario-data">${formatData(c.criadoEm)}</span>
+          ${(c.autorId === currentUser?.id || podeEditar())
+            ? `<button class="btn-marcar-lido" style="color:var(--danger,#ef4444)" onclick="deletarComentario(${resumoId}, ${c.id})"><i class="ti ti-trash"></i></button>`
+            : ''}
+        </div>
+        <div class="comentario-corpo">${escapeHtml(c.corpo)}</div>
+      </div>`).join('') : '<div style="color:var(--text-3);font-size:12px">Nenhum comentário ainda. Seja o primeiro!</div>';
+  } catch(e) { lista.innerHTML = '<div style="color:var(--text-3);font-size:12px">Erro ao carregar comentários.</div>'; }
+}
+
+async function publicarComentario(resumoId) {
+  const input = document.getElementById(`com-input-${resumoId}`);
+  const corpo = input.value.trim();
+  if (!corpo) return;
+  try {
+    await apiPost(`/resumos/${resumoId}/comentarios`, { corpo });
+    input.value = '';
+    await carregarComentarios(resumoId);
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function deletarComentario(resumoId, comentarioId) {
+  if (!confirm('Remover este comentário?')) return;
+  try {
+    await apiDel(`/resumos/${resumoId}/comentarios/${comentarioId}`);
+    await carregarComentarios(resumoId);
+  } catch(e) { toast(e.message, 'error'); }
+}
+
 /* ── PROVAS ──────────────────────────────────────────────── */
+let todasAsProvas = [];
+
 async function carregarProvas() {
-  document.getElementById('provas-list').innerHTML = skeletonCards(3);
   try {
     const data = await apiGet('/provas');
-    const el = document.getElementById('provas-list');
-    el.innerHTML = data.map(p => {
+    todasAsProvas = data;
+    renderProvas(data);
+    document.getElementById('adm-stat-prov').textContent = data.length;
+    const prox = [...data].sort((a,b) => new Date(a.data)-new Date(b.data))[0];
+    if (prox) {
+      document.getElementById('stat-prova').textContent = prox.disciplina + ' · ' + formatDataCurta(prox.data);
+      const d = diasAte(prox.data);
+      document.getElementById('stat-prova-dias').textContent = d <= 0 ? 'hoje!' : d + ' dias';
+    }
+  } catch(e) { console.error('Provas:', e); }
+}
+
+function renderProvas(data) {
+  const el = document.getElementById('provas-list');
+  if (!data.length) { el.innerHTML = '<div style="color:var(--text-3);font-size:13px">Nenhuma prova encontrada.</div>'; return; }
+  el.innerHTML = data.map(p => {
       const dias = diasAte(p.data);
       const cls = dias <= 7 ? 'db-urgente' : dias <= 14 ? 'db-atencao' : 'db-ok';
       const partes = p.data.split('-');
@@ -1994,26 +1771,19 @@ async function carregarProvas() {
             <div class="pd-mon">${meses[mesNum]}</div>
           </div>
           <div class="prova-info">
-            <div class="prova-disc">${p.disciplina}</div>
-            <div class="prova-det">${p.conteudo}${p.horario ? ' · ' + p.horario : ''}</div>
+            <div class="prova-disc">${escapeHtml(p.disciplina)}</div>
+            <div class="prova-det">${escapeHtml(p.conteudo)}${p.horario ? ' · ' + escapeHtml(p.horario) : ''}</div>
           </div>
           <span class="dias-badge ${cls}">${dias <= 0 ? 'hoje!' : dias + ' dias'}</span>
-          <button id="entrega-btn-${p.id}" class="btn-secondary" style="font-size:12px;padding:5px 10px;margin-left:6px" onclick="toggleEntrega(${p.id})">
-            <i class="ti ti-circle-check"></i> <span>Entreguei</span>
-          </button>
-          ${podeEditar() ? `<button class="btn-danger" style="margin-left:4px" onclick="deletarProva(${p.id})"><i class="ti ti-trash"></i></button>` : ''}
+          ${podeEditar() ? `<button class="btn-danger" style="margin-left:8px" onclick="deletarProva(${p.id})"><i class="ti ti-trash"></i></button>` : ''}
         </div>`;
     }).join('');
-    document.getElementById('adm-stat-prov').textContent = data.length;
-    const prox = [...data].sort((a,b) => new Date(a.data)-new Date(b.data))[0];
-    if (prox) {
-      document.getElementById('stat-prova').textContent = prox.disciplina + ' · ' + formatDataCurta(prox.data);
-      const d = diasAte(prox.data);
-      document.getElementById('stat-prova-dias').textContent = d <= 0 ? 'hoje!' : d + ' dias';
-    }
-    // carrega entregas do usuário
-    data.forEach(p => carregarEntregaProva(p.id));
-  } catch(e) { console.error('Provas:', e); }
+}
+
+function filtrarProv(disc, btn) {
+  document.querySelectorAll('#prov-filters button').forEach(b => b.classList.remove('active-filter'));
+  btn.classList.add('active-filter');
+  renderProvas(disc ? todasAsProvas.filter(p => p.disciplina === disc) : todasAsProvas);
 }
 
 async function adicionarProva() {
@@ -2052,8 +1822,8 @@ async function carregarMembros() {
     tbody.innerHTML = data.map(m => `
       <tr>
         <td>
-          <span class="member-avatar">${iniciais(m.nome)}</span>
-          ${m.nome} <span style="color:var(--text-3);font-size:11px">(${m.usuario})</span>
+          <span class="member-avatar">${escapeHtml(iniciais(m.nome))}</span>
+          ${escapeHtml(m.nome)} <span style="color:var(--text-3);font-size:11px">(${escapeHtml(m.usuario)})</span>
         </td>
         <td><span class="tag ${TAG_CARGO[m.role]||'cargo-aluno'}">${NOME_CARGO[m.role]||m.role}</span></td>
         <td>
@@ -2088,17 +1858,17 @@ async function carregarLideranca() {
 
     if (lider) cards.innerHTML += `
       <div class="lider-card lider-principal">
-        <div class="lider-avatar">${iniciais(lider.nome)}</div>
-        <div class="lider-nome">${lider.nome}</div>
-        <div class="lider-cargo">@${lider.usuario}</div>
+        <div class="lider-avatar">${escapeHtml(iniciais(lider.nome))}</div>
+        <div class="lider-nome">${escapeHtml(lider.nome)}</div>
+        <div class="lider-cargo">@${escapeHtml(lider.usuario)}</div>
         <div class="lider-badge"><i class="ti ti-shield-star" style="font-size:14px"></i> Líder da Sala</div>
       </div>`;
 
     if (vice) cards.innerHTML += `
       <div class="lider-card lider-vice">
-        <div class="lider-avatar">${iniciais(vice.nome)}</div>
-        <div class="lider-nome">${vice.nome}</div>
-        <div class="lider-cargo">@${vice.usuario}</div>
+        <div class="lider-avatar">${escapeHtml(iniciais(vice.nome))}</div>
+        <div class="lider-nome">${escapeHtml(vice.nome)}</div>
+        <div class="lider-cargo">@${escapeHtml(vice.usuario)}</div>
         <div class="lider-badge"><i class="ti ti-shield-half" style="font-size:14px"></i> Vice-líder da Sala</div>
       </div>`;
 
@@ -2109,8 +1879,8 @@ async function carregarLideranca() {
     tbody.innerHTML = data.map(m => `
       <tr>
         <td>
-          <span class="member-avatar">${iniciais(m.nome)}</span>
-          ${m.nome}
+          <span class="member-avatar">${escapeHtml(iniciais(m.nome))}</span>
+          ${escapeHtml(m.nome)}
         </td>
         <td><span class="tag ${TAG_CARGO[m.role]||'cargo-aluno'}">${NOME_CARGO[m.role]||m.role}</span></td>
       </tr>`).join('');
@@ -2127,9 +1897,9 @@ async function carregarCreditos() {
 
     function creditCard(m) {
       return `<div class="credits-person">
-        <div class="credits-avatar" style="background:${avatarBgs[m.role]||'#eff6ff'};color:${avatarColors[m.role]||'#1a56db'}">${iniciais(m.nome)}</div>
+        <div class="credits-avatar" style="background:${avatarBgs[m.role]||'#eff6ff'};color:${avatarColors[m.role]||'#1a56db'}">${escapeHtml(iniciais(m.nome))}</div>
         <div>
-          <div class="credits-name">${m.nome}</div>
+          <div class="credits-name">${escapeHtml(m.nome)}</div>
           <div class="credits-role">${NOME_CARGO[m.role]||m.role}</div>
         </div>
         <span class="tag ${TAG_CARGO[m.role]||'cargo-aluno'}" style="margin-left:auto">${NOME_CARGO[m.role]||m.role}</span>
@@ -2162,6 +1932,20 @@ async function criarConta() {
     document.getElementById('nc-usuario').value = '';
     document.getElementById('nc-senha').value = '';
     document.getElementById('nc-role').value = 'aluno';
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+/* ── TROCAR SENHA ────────────────────────────────────────── */
+async function trocarSenha() {
+  const senhaAtual = document.getElementById('senha-atual').value;
+  const novaSenha  = document.getElementById('senha-nova').value;
+  if (!senhaAtual || !novaSenha) { toast('Preencha os dois campos.', 'error'); return; }
+  if (novaSenha.length < 6) { toast('A nova senha deve ter ao menos 6 caracteres.', 'error'); return; }
+  try {
+    await apiPut('/auth/senha', { senhaAtual, novaSenha });
+    toast('Senha alterada com sucesso!', 'success');
+    document.getElementById('senha-atual').value = '';
+    document.getElementById('senha-nova').value = '';
   } catch(e) { toast(e.message, 'error'); }
 }
 
@@ -2198,794 +1982,7 @@ function renderCalendario() {
   grid.innerHTML = html;
 }
 
-/* ── SIDEBAR AVATAR com foto ────────────────────────────── */
-function atualizarSidebarAvatar() {
-  if (!currentUser) return;
-  const sbAv = document.getElementById('sb-avatar');
-  if (currentUser.avatar_url) {
-    sbAv.style.backgroundImage = `url(${BASE_URL}${currentUser.avatar_url})`;
-    sbAv.style.backgroundSize = 'cover';
-    sbAv.textContent = '';
-  } else {
-    sbAv.style.backgroundImage = '';
-    sbAv.textContent = currentUser.iniciais || iniciais(currentUser.nome);
-  }
-}
-
-/* ── PERFIL ──────────────────────────────────────────────── */
-function abrirPerfil() {
-  if (!currentUser) return;
-  const inicIEl = document.getElementById('perfil-avatar-iniciais');
-  const avatarEl = document.getElementById('perfil-avatar-img');
-  inicIEl.textContent = currentUser.iniciais || iniciais(currentUser.nome);
-  if (currentUser.avatar_url) {
-    avatarEl.style.backgroundImage = `url(${BASE_URL}${currentUser.avatar_url})`;
-    avatarEl.style.backgroundSize = 'cover';
-    avatarEl.style.backgroundPosition = 'center';
-    inicIEl.style.display = 'none';
-  } else {
-    avatarEl.style.backgroundImage = '';
-    inicIEl.style.display = '';
-  }
-  document.getElementById('perfil-nome').textContent    = currentUser.nome;
-  document.getElementById('perfil-usuario').textContent = '@' + currentUser.usuario;
-  const cargoEl = document.getElementById('perfil-cargo');
-  cargoEl.textContent = NOME_CARGO[currentUser.role] || currentUser.role;
-  cargoEl.className = 'tag ' + (TAG_CARGO[currentUser.role] || 'cargo-aluno');
-  const bio = currentUser.bio || '';
-  document.getElementById('perfil-bio').value = bio;
-  document.getElementById('perfil-bio-count').textContent = bio.length + '/300';
-
-  // popula select de membros
-  apiGet('/membros').then(data => {
-    const sel = document.getElementById('perfil-select-membro');
-    sel.innerHTML = data.filter(m => m.id !== currentUser.id)
-      .map(m => `<option value="${m.id}">${m.nome} (@${m.usuario})</option>`).join('');
-  }).catch(() => {});
-}
-
-// contador de bio
-document.addEventListener('DOMContentLoaded', () => {
-  const bioTa = document.getElementById('perfil-bio');
-  if (bioTa) bioTa.addEventListener('input', () => {
-    document.getElementById('perfil-bio-count').textContent = bioTa.value.length + '/300';
-  });
-});
-
-async function salvarBio() {
-  const bio = document.getElementById('perfil-bio').value.trim();
-  try {
-    const updated = await apiFetch('/perfil/me', { method: 'PUT', body: JSON.stringify({ bio }) });
-    currentUser.bio = updated.bio;
-    toast('Bio salva!', 'success');
-  } catch(e) { toast(e.message, 'error'); }
-}
-
-async function uploadAvatar(input) {
-  const file = input.files[0]; if (!file) return;
-  const formData = new FormData();
-  formData.append('avatar', file);
-  try {
-    const res = await fetch(BASE_URL + '/perfil/me/avatar', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}` },
-      body: formData,
-    });
-    if (!res.ok) throw new Error('Erro ao enviar avatar');
-    const data = await res.json();
-    currentUser.avatar_url = data.avatar_url;
-    atualizarSidebarAvatar();
-    abrirPerfil();
-    toast('Foto atualizada!', 'success');
-  } catch(e) { toast(e.message, 'error'); }
-  input.value = '';
-}
-
-async function verPerfilMembro() {
-  const id = document.getElementById('perfil-select-membro').value;
-  if (!id) return;
-  try {
-    const m = await apiGet(`/perfil/${id}`);
-    const modal = document.getElementById('perfil-membro-modal');
-    const avatarEl = document.getElementById('pm-avatar');
-    if (m.avatar_url) {
-      avatarEl.style.backgroundImage = `url(${BASE_URL}${m.avatar_url})`;
-      avatarEl.style.backgroundSize = 'cover';
-      avatarEl.style.backgroundPosition = 'center';
-      avatarEl.textContent = '';
-    } else {
-      avatarEl.style.backgroundImage = '';
-      avatarEl.textContent = m.iniciais || iniciais(m.nome);
-    }
-    document.getElementById('pm-nome').textContent    = m.nome;
-    document.getElementById('pm-usuario').textContent = '@' + m.usuario;
-    const pmCargo = document.getElementById('pm-cargo');
-    pmCargo.textContent = NOME_CARGO[m.role] || m.role;
-    pmCargo.className = 'tag ' + (TAG_CARGO[m.role] || 'cargo-aluno');
-    document.getElementById('pm-bio').textContent = m.bio || 'Sem bio ainda.';
-    document.getElementById('pm-desde').textContent = m.criadoEm
-      ? 'Membro desde ' + new Date(m.criadoEm).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
-      : '';
-    modal.style.display = 'block';
-  } catch(e) { toast('Erro ao carregar perfil.', 'error'); }
-}
-
-/* ── ADMIN DEV — online, logins, logs ──────────────────── */
-function abrirAdmin() {
-  if (isDev()) {
-    document.getElementById('admin-dev-section').classList.remove('hidden');
-    carregarOnline();
-    carregarLoginsAdmin();
-    carregarLogs();
-  }
-}
-
-async function carregarOnline() {
-  const el = document.getElementById('admin-online-list');
-  try {
-    const data = await apiGet('/admin/online');
-    if (!data.length) {
-      el.innerHTML = '<div style="padding:1rem;color:var(--text-3);font-size:13px">Nenhum usuário online agora.</div>';
-      return;
-    }
-    el.innerHTML = `<div style="padding:.75rem 1rem;display:flex;flex-wrap:wrap;gap:10px">` +
-      data.map(u => `
-        <div style="display:flex;align-items:center;gap:8px;background:var(--bg);border-radius:8px;padding:6px 12px;border:1px solid var(--border)">
-          <span style="width:8px;height:8px;border-radius:50%;background:#10b981;flex-shrink:0"></span>
-          <span style="font-weight:600;font-size:13px;color:var(--text-1)">${u.nome}</span>
-          <span style="font-size:11px;color:var(--text-3)">@${u.usuario}</span>
-        </div>`).join('') + `</div>`;
-  } catch(e) { el.innerHTML = '<div style="padding:1rem;color:var(--text-3)">Erro ao carregar.</div>'; }
-}
-
-async function carregarLoginsAdmin() {
-  const tbody = document.getElementById('admin-logins-tbody');
-  try {
-    const data = await apiGet('/admin/membros');
-    tbody.innerHTML = data.map(m => {
-      const ultimoLogin = m.ultimoLogin
-        ? new Date(m.ultimoLogin).toLocaleString('pt-BR', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' })
-        : 'Nunca';
-      const statusHtml = m.online
-        ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#10b981;font-weight:600"><span style="width:7px;height:7px;border-radius:50%;background:#10b981"></span>Online</span>`
-        : `<span style="font-size:12px;color:var(--text-3)">Offline</span>`;
-      return `<tr>
-        <td>
-          <span class="member-avatar">${m.iniciais || iniciais(m.nome)}</span>
-          ${m.nome} <span style="color:var(--text-3);font-size:11px">(${m.usuario})</span>
-        </td>
-        <td><span class="tag ${TAG_CARGO[m.role]||'cargo-aluno'}">${NOME_CARGO[m.role]||m.role}</span></td>
-        <td style="font-size:13px;color:var(--text-2)">${ultimoLogin}</td>
-        <td>${statusHtml}</td>
-      </tr>`;
-    }).join('');
-  } catch(e) { tbody.innerHTML = `<tr><td colspan="4" style="color:var(--text-3)">Erro ao carregar.</td></tr>`; }
-}
-
-const LOG_ICONE = {
-  'resumo:criar':'ti-notes', 'resumo:deletar':'ti-trash',
-  'aviso:criar':'ti-speakerphone', 'aviso:deletar':'ti-trash',
-  'material:criar':'ti-upload', 'material:deletar':'ti-trash',
-  'prova:criar':'ti-writing', 'prova:deletar':'ti-trash',
-  'evento:criar':'ti-calendar-plus', 'evento:deletar':'ti-trash',
-};
-const LOG_COR = {
-  criar:'#10b981', deletar:'#ef4444',
-};
-
-async function carregarLogs() {
-  const el = document.getElementById('admin-logs-list');
-  const filtro = document.getElementById('log-filtro')?.value || '';
-  try {
-    const url = '/admin/logs?limit=50' + (filtro ? `&acao=${filtro}` : '');
-    const data = await apiGet(url);
-    if (!data.length) {
-      el.innerHTML = '<div style="padding:1rem;color:var(--text-3);font-size:13px">Nenhum log registrado ainda.</div>';
-      return;
-    }
-    el.innerHTML = data.map(l => {
-      const verbo = l.acao.split(':')[1] || 'acao';
-      const cor   = LOG_COR[verbo] || 'var(--text-3)';
-      const icone = LOG_ICONE[l.acao] || 'ti-activity';
-      const dt    = new Date(l.criadoEm).toLocaleString('pt-BR', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
-      const av    = l.iniciais || iniciais(l.usuarioNome || '?');
-      return `
-        <div style="display:flex;align-items:center;gap:12px;padding:10px 1rem;border-bottom:1px solid var(--border)">
-          <span class="member-avatar" style="flex-shrink:0;font-size:11px">${av}</span>
-          <i class="ti ${icone}" style="color:${cor};font-size:16px;flex-shrink:0"></i>
-          <div style="flex:1;min-width:0">
-            <div style="font-size:13px;color:var(--text-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${l.descricao || l.acao}</div>
-            <div style="font-size:11px;color:var(--text-3)">${l.usuarioNome || '?'} · ${dt}</div>
-          </div>
-        </div>`;
-    }).join('');
-  } catch(e) { el.innerHTML = '<div style="padding:1rem;color:var(--text-3)">Erro ao carregar logs.</div>'; }
-}
-
-/* ── HEARTBEAT — atualiza online_at a cada 90s ─────────── */
-function startHeartbeat() {
-  const ping = () => apiFetch('/admin/heartbeat', { method: 'POST' }).catch(() => {});
-  ping();
-  setInterval(ping, 90_000);
-}
-
-
-/* ── ÚLTIMAS ATUALIZAÇÕES ────────────────────────────────── */
-const UPD_LABEL = { novidade:'✨ Novidade', melhoria:'🔧 Melhoria', correcao:'🐛 Correção', aviso:'📢 Aviso' };
-
-async function carregarAtualizacoes() {
-  const el = document.getElementById('atualizacoes-list');
-  el.innerHTML = skeletonCards(3);
-  try {
-    const data = await apiGet('/atualizacoes');
-    if (!data.length) {
-      el.innerHTML = '<div style="color:var(--text-3);font-size:13px">Nenhuma atualização publicada ainda.</div>';
-      return;
-    }
-    el.innerHTML = data.map(u => {
-      const dt = new Date(u.criadoEm).toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' });
-      const deletarBtn = isDev()
-        ? `<button class="btn-danger" style="margin-left:auto;padding:3px 8px;font-size:12px" onclick="deletarAtualizacao(${u.id})"><i class="ti ti-trash"></i></button>`
-        : '';
-      return `
-        <div class="upd-card tipo-${u.tipo}">
-          <div class="upd-head">
-            <span class="upd-badge tipo-${u.tipo}">${UPD_LABEL[u.tipo] || u.tipo}</span>
-            ${u.versao ? `<span class="upd-versao">v${u.versao}</span>` : ''}
-            <div class="upd-titulo">${u.titulo}</div>
-            ${deletarBtn}
-          </div>
-          <div class="upd-corpo">${u.corpo}</div>
-          <div class="upd-meta">
-            <i class="ti ti-user" style="font-size:12px"></i> ${u.autorNome || 'Dev'}
-            <span>·</span>
-            <i class="ti ti-calendar" style="font-size:12px"></i> ${dt}
-          </div>
-        </div>`;
-    }).join('');
-  } catch(e) {
-    el.innerHTML = '<div style="color:var(--text-3);font-size:13px">Erro ao carregar atualizações.</div>';
-  }
-}
-
-async function publicarAtualizacao() {
-  const titulo = document.getElementById('upd-titulo').value.trim();
-  const corpo  = document.getElementById('upd-corpo').value.trim();
-  const tipo   = document.getElementById('upd-tipo').value;
-  const versao = document.getElementById('upd-versao').value.trim();
-  if (!titulo || !corpo) { toast('Preencha título e descrição.', 'error'); return; }
-  try {
-    await apiPost('/atualizacoes', { titulo, corpo, tipo, versao });
-    toast('Atualização publicada!', 'success');
-    document.getElementById('upd-titulo').value = '';
-    document.getElementById('upd-corpo').value  = '';
-    document.getElementById('upd-versao').value = '';
-    document.getElementById('form-atualizacao').classList.add('hidden');
-    await carregarAtualizacoes();
-  } catch(e) { toast(e.message, 'error'); }
-}
-
-async function deletarAtualizacao(id) {
-  if (!confirm('Remover esta atualização?')) return;
-  try {
-    await apiDel(`/atualizacoes/${id}`);
-    toast('Removido.', 'success');
-    await carregarAtualizacoes();
-  } catch(e) { toast(e.message, 'error'); }
-}
-
-/* ── BUGS ────────────────────────────────────────────────── */
-const BUG_PRIO_LABEL  = { critico:'🔴 Crítico', alto:'🟠 Alto', medio:'🟡 Médio', baixo:'🟢 Baixo' };
-const BUG_STATUS_LABEL = { aberto:'Aberto', em_analise:'Em análise', resolvido:'Resolvido', ignorado:'Ignorado' };
-
-async function reportarBug() {
-  const titulo     = document.getElementById('bug-titulo').value.trim();
-  const descricao  = document.getElementById('bug-descricao').value.trim();
-  const pagina     = document.getElementById('bug-pagina').value;
-  const prioridade = document.getElementById('bug-prioridade').value;
-  if (!titulo || !descricao) { toast('Preencha título e descrição.', 'error'); return; }
-  try {
-    await apiPost('/bugs', { titulo, descricao, pagina, prioridade });
-    document.getElementById('bug-titulo').value    = '';
-    document.getElementById('bug-descricao').value = '';
-    document.getElementById('bug-pagina').value    = '';
-    document.getElementById('bug-prioridade').value = 'medio';
-    document.getElementById('bug-enviado').classList.remove('hidden');
-    setTimeout(() => document.getElementById('bug-enviado').classList.add('hidden'), 5000);
-  } catch(e) { toast(e.message || 'Erro ao enviar.', 'error'); }
-}
-
-async function carregarBugs() {
-  const el = document.getElementById('bugs-lista');
-  el.innerHTML = skeletonCards(3);
-  try {
-    let data = await apiGet('/bugs');
-    const filtroStatus    = document.getElementById('bugs-filtro-status')?.value;
-    const filtroPrioridade = document.getElementById('bugs-filtro-prioridade')?.value;
-    if (filtroStatus)     data = data.filter(b => b.status === filtroStatus);
-    if (filtroPrioridade) data = data.filter(b => b.prioridade === filtroPrioridade);
-    if (!data.length) {
-      el.innerHTML = '<div style="color:var(--text-3);font-size:13px">Nenhum bug encontrado.</div>';
-      return;
-    }
-    el.innerHTML = data.map(b => {
-      const dt = new Date(b.criadoEm).toLocaleString('pt-BR', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
-      const av = b.iniciais || iniciais(b.autorNome || '?');
-      const deletarBtn = isDev()
-        ? `<button class="btn-danger" style="padding:3px 8px;font-size:12px" onclick="deletarBug(${b.id})"><i class="ti ti-trash"></i></button>`
-        : '';
-      return `
-        <div class="bug-card prio-${b.prioridade} status-${b.status}" id="bug-card-${b.id}">
-          <div class="bug-head">
-            <span class="bug-badge-prio ${b.prioridade}">${BUG_PRIO_LABEL[b.prioridade]}</span>
-            ${b.pagina ? `<span style="font-size:11px;color:var(--text-3);background:var(--bg);padding:2px 8px;border-radius:20px;border:1px solid var(--border)">${b.pagina}</span>` : ''}
-            <div class="bug-titulo-text">${b.titulo}</div>
-            ${deletarBtn}
-          </div>
-          <div style="font-size:13px;color:var(--text-2);line-height:1.6;margin-bottom:.75rem;white-space:pre-wrap">${b.descricao}</div>
-          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-            <span class="member-avatar" style="font-size:10px;width:24px;height:24px;flex-shrink:0">${av}</span>
-            <span style="font-size:12px;color:var(--text-3)">${b.autorNome || '?'} · ${dt}</span>
-            <select class="bug-status-select" onchange="mudarStatusBug(${b.id}, this.value)" style="margin-left:auto">
-              ${['aberto','em_analise','resolvido','ignorado'].map(s =>
-                `<option value="${s}" ${b.status===s?'selected':''}>${BUG_STATUS_LABEL[s]}</option>`
-              ).join('')}
-            </select>
-          </div>
-        </div>`;
-    }).join('');
-  } catch(e) {
-    el.innerHTML = '<div style="color:var(--text-3);font-size:13px">Sem permissão ou erro ao carregar.</div>';
-  }
-}
-
-async function mudarStatusBug(id, status) {
-  try {
-    await apiFetch(`/bugs/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) });
-    const card = document.getElementById(`bug-card-${id}`);
-    if (card) {
-      card.className = card.className.replace(/status-\w+/, `status-${status}`);
-    }
-    toast('Status atualizado!', 'success');
-  } catch(e) { toast(e.message, 'error'); }
-}
-
-async function deletarBug(id) {
-  if (!confirm('Deletar este bug?')) return;
-  try {
-    await apiDel(`/bugs/${id}`);
-    toast('Bug removido.', 'success');
-    await carregarBugs();
-  } catch(e) { toast(e.message, 'error'); }
-}
-
-/* ── SIDEBAR MOBILE ──────────────────────────────────────── */
-function openSidebar() {
-  document.querySelector('.sidebar').classList.add('open');
-  document.getElementById('sidebar-overlay').classList.add('visible');
-  document.getElementById('hamburger-icon').className = 'ti ti-x';
-}
-function closeSidebar() {
-  document.querySelector('.sidebar').classList.remove('open');
-  document.getElementById('sidebar-overlay').classList.remove('visible');
-  document.getElementById('hamburger-icon').className = 'ti ti-menu-2';
-}
-function toggleSidebar() {
-  document.querySelector('.sidebar').classList.contains('open') ? closeSidebar() : openSidebar();
-}
-
-// Fecha ao clicar em nav item no mobile
-document.querySelectorAll('.nav-item').forEach(item => {
-  item.addEventListener('click', () => { if (window.innerWidth <= 768) closeSidebar(); });
-});
-
-// Swipe gesture
-(function() {
-  let startX = 0, startY = 0, active = false;
-  const EDGE = 30, MIN_SWIPE = 50, MAX_VERT = 70;
-  document.addEventListener('touchstart', e => {
-    startX = e.touches[0].clientX;
-    startY = e.touches[0].clientY;
-    active = startX < EDGE || document.querySelector('.sidebar').classList.contains('open');
-  }, { passive: true });
-  document.addEventListener('touchend', e => {
-    if (!active) return;
-    const dx = e.changedTouches[0].clientX - startX;
-    const dy = Math.abs(e.changedTouches[0].clientY - startY);
-    if (dy > MAX_VERT || Math.abs(dx) < MIN_SWIPE) return;
-    if (dx > 0) openSidebar(); else closeSidebar();
-    active = false;
-  }, { passive: true });
-})();
-
-/* ── HORÁRIOS ────────────────────────────────────────────── */
-const AULA_CLASSE = {
-  'Matemática':'aula-mat','Português':'aula-port','Ciências':'aula-cie',
-  'História':'aula-hist','Geografia':'aula-geo','Ed. Física':'aula-ed',
-  'Artes':'aula-art','Inglês':'aula-ing',
-};
-const AULA_TAG = {
-  'Matemática':'tag-blue','Português':'tag-purple','Ciências':'tag-green',
-  'História':'tag-orange','Geografia':'tag-teal','Ed. Física':'tag-sky',
-  'Artes':'tag-amber','Inglês':'',
-};
-
-let gradeAtual = null;
-
-async function carregarHorarios() {
-  try {
-    gradeAtual = await apiGet('/horarios');
-    renderizarGrade(gradeAtual);
-    // mostra botão editar pra quem pode
-    const podeEditar = ['lider','ajudante_dev','dev'].includes(currentUser?.role);
-    document.getElementById('btn-editar-horario-wrap').classList.toggle('hidden', !podeEditar);
-  } catch(e) {
-    console.error('Erro ao carregar horários', e);
-  }
-}
-
-function renderizarGrade(grade) {
-  const grid = document.getElementById('schedule-grid');
-  // mantém os headers
-  grid.innerHTML = `
-    <div class="sc-cell sc-header">Horário</div>
-    <div class="sc-cell sc-header">Segunda</div>
-    <div class="sc-cell sc-header">Terça</div>
-    <div class="sc-cell sc-header">Quarta</div>
-    <div class="sc-cell sc-header">Quinta</div>
-    <div class="sc-cell sc-header">Sexta</div>`;
-
-  grade.periodos.forEach((periodo, i) => {
-    const aulas = grade.aulas[i];
-    if (aulas === null || periodo === 'INTERVALO') {
-      // intervalo — célula de tempo + break mesclada
-      const tempo = periodo === 'INTERVALO' ? (grade.horarioIntervalo || '9h30–9h50') : periodo;
-      grid.innerHTML += `<div class="sc-cell sc-time">${tempo}</div>`;
-      grid.innerHTML += `<div class="sc-cell sc-break" style="grid-column:span 5">— intervalo —</div>`;
-    } else {
-      grid.innerHTML += `<div class="sc-cell sc-time">${periodo}</div>`;
-      aulas.forEach(disc => {
-        const cls = AULA_CLASSE[disc] || '';
-        grid.innerHTML += `<div class="sc-cell sc-aula ${cls}">${disc}</div>`;
-      });
-    }
-  });
-
-  // legenda dinâmica
-  const disciplinas = [...new Set(grade.aulas.filter(Boolean).flat())];
-  const legend = document.getElementById('horario-legend');
-  legend.innerHTML = disciplinas.map(d => {
-    const tag = AULA_TAG[d];
-    const style = tag ? '' : 'style="background:#f5f3ff;color:#3730a3"';
-    return `<span class="tag ${tag}" ${style}>${d}</span>`;
-  }).join('');
-}
-
-function toggleEditorHorario() {
-  const editor = document.getElementById('horario-editor');
-  const view   = document.getElementById('horario-view');
-  const aberto = !editor.classList.contains('hidden');
-  if (aberto) {
-    editor.classList.add('hidden');
-    view.classList.remove('hidden');
-    document.getElementById('btn-editar-horario').innerHTML = '<i class="ti ti-pencil"></i> Editar horários';
-  } else {
-    editor.classList.remove('hidden');
-    view.classList.add('hidden');
-    document.getElementById('btn-editar-horario').innerHTML = '<i class="ti ti-eye"></i> Ver grade';
-    renderizarEditor(gradeAtual);
-  }
-}
-
-function renderizarEditor(grade) {
-  const grid = document.getElementById('horario-editor-grid');
-  const dias = ['Segunda','Terça','Quarta','Quinta','Sexta'];
-  grid.innerHTML = `
-    <div style="font-size:11px;font-weight:700;color:var(--text-3);padding:4px 6px;text-transform:uppercase">Horário</div>
-    ${dias.map(d => `<div style="font-size:11px;font-weight:700;color:var(--text-3);padding:4px 6px;text-align:center;text-transform:uppercase">${d}</div>`).join('')}`;
-
-  grade.periodos.forEach((periodo, i) => {
-    const aulas = grade.aulas[i];
-    const isIntervalo = aulas === null || periodo === 'INTERVALO';
-
-    // célula de horário (editável)
-    const tempoVal = periodo === 'INTERVALO' ? (grade.horarioIntervalo || '9h30–9h50') : periodo;
-    grid.innerHTML += `<input class="inp" style="font-size:12px;padding:5px 7px;text-align:center"
-      data-tipo="periodo" data-idx="${i}" value="${tempoVal}" />`;
-
-    if (isIntervalo) {
-      grid.innerHTML += `<div style="grid-column:span 5;background:var(--bg);border-radius:6px;padding:5px 10px;font-size:12px;color:var(--text-3);text-align:center;border:1px solid var(--border)">
-        — intervalo — <button onclick="removerIntervalo(${i})" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:11px;margin-left:8px">✕ remover</button>
-      </div>`;
-    } else {
-      aulas.forEach((disc, j) => {
-        grid.innerHTML += `<input class="inp" style="font-size:12px;padding:5px 7px;text-align:center"
-          data-tipo="aula" data-periodo="${i}" data-dia="${j}" value="${disc}" />`;
-      });
-    }
-  });
-
-  // botão adicionar linha
-  grid.innerHTML += `<button class="btn-secondary" style="grid-column:span 6;font-size:12px;margin-top:4px" onclick="adicionarPeriodo()">
-    <i class="ti ti-plus"></i> Adicionar período
-  </button>
-  <button class="btn-secondary" style="grid-column:span 6;font-size:12px" onclick="adicionarIntervalo()">
-    <i class="ti ti-coffee"></i> Adicionar intervalo
-  </button>`;
-}
-
-function lerGradeDoEditor() {
-  const grid = document.getElementById('horario-editor-grid');
-  const periodos = [...grid.querySelectorAll('[data-tipo="periodo"]')].map(i => {
-    const idx = parseInt(i.dataset.idx);
-    return gradeAtual.aulas[idx] === null ? 'INTERVALO' : i.value.trim();
-  });
-  const horarioIntervalo = [...grid.querySelectorAll('[data-tipo="periodo"]')].reduce((acc, el) => {
-    const idx = parseInt(el.dataset.idx);
-    if (gradeAtual.aulas[idx] === null) acc = el.value.trim();
-    return acc;
-  }, '9h30–9h50');
-
-  const aulaInputs = [...grid.querySelectorAll('[data-tipo="aula"]')];
-  const aulas = gradeAtual.aulas.map((row, i) => {
-    if (row === null) return null;
-    return [0,1,2,3,4].map(j => {
-      const inp = aulaInputs.find(el => parseInt(el.dataset.periodo)===i && parseInt(el.dataset.dia)===j);
-      return inp ? inp.value.trim() : '';
-    });
-  });
-  return { periodos, aulas, horarioIntervalo };
-}
-
-function adicionarPeriodo() {
-  gradeAtual.periodos.push('00h00–00h00');
-  gradeAtual.aulas.push(['','','','','']);
-  renderizarEditor(gradeAtual);
-}
-
-function adicionarIntervalo() {
-  gradeAtual.periodos.push('INTERVALO');
-  gradeAtual.aulas.push(null);
-  renderizarEditor(gradeAtual);
-}
-
-function removerIntervalo(idx) {
-  gradeAtual.periodos.splice(idx, 1);
-  gradeAtual.aulas.splice(idx, 1);
-  renderizarEditor(gradeAtual);
-}
-
-async function salvarHorario() {
-  const novaGrade = lerGradeDoEditor();
-  try {
-    await apiPut('/horarios', novaGrade);
-    gradeAtual = novaGrade;
-    renderizarGrade(gradeAtual);
-    toggleEditorHorario();
-    toast('Horários salvos!', 'success');
-  } catch(e) { toast(e.message || 'Erro ao salvar.', 'error'); }
-}
-
-/* ── SKELETON HELPERS ────────────────────────────────────── */
-function skeletonCards(n = 3, avatar = false) {
-  return Array.from({ length: n }, () => `
-    <div class="sk-card">
-      ${avatar ? `<div class="sk-row"><div class="skeleton sk-avatar"></div><div style="flex:1"><div class="skeleton sk-line" style="width:40%"></div><div class="skeleton sk-line" style="width:65%"></div></div></div>` : ''}
-      <div class="skeleton sk-title"></div>
-      <div class="skeleton sk-line" style="width:90%"></div>
-      <div class="skeleton sk-line" style="width:75%"></div>
-      <div class="skeleton sk-line" style="width:55%"></div>
-    </div>`).join('');
-}
-function skeletonLinhas(n = 4) {
-  return `<div style="padding:.5rem 0">${Array.from({ length: n }, () =>
-    `<div class="skeleton sk-line" style="width:${60+Math.random()*35|0}%;margin-bottom:10px"></div>`
-  ).join('')}</div>`;
-}
-
-/* ── COMENTÁRIOS ─────────────────────────────────────────── */
-async function toggleComentarios(resumoId) {
-  const sec = document.getElementById(`comentarios-${resumoId}`);
-  if (sec.style.display === 'none') {
-    sec.style.display = 'block';
-    await carregarComentarios(resumoId);
-  } else {
-    sec.style.display = 'none';
-  }
-}
-
-async function carregarComentarios(resumoId) {
-  const el = document.getElementById(`coment-list-${resumoId}`);
-  el.innerHTML = skeletonLinhas(2);
-  try {
-    const data = await apiGet(`/comentarios/${resumoId}`);
-    if (!data.length) { el.innerHTML = '<div style="font-size:12px;color:var(--text-3)">Sem comentários ainda. Seja o primeiro!</div>'; return; }
-    el.innerHTML = data.map(c => {
-      const av = c.iniciais || iniciais(c.autorNome || '?');
-      const dt = new Date(c.criadoEm).toLocaleString('pt-BR', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
-      const podeApagar = c.autorId === currentUser?.id || ['lider','ajudante_dev','dev'].includes(currentUser?.role);
-      return `
-        <div style="display:flex;gap:8px;margin-bottom:.75rem" id="coment-${c.id}">
-          <span class="member-avatar" style="width:28px;height:28px;font-size:10px;flex-shrink:0">${av}</span>
-          <div style="flex:1;background:var(--bg);border-radius:8px;padding:7px 10px;border:1px solid var(--border)">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
-              <span style="font-size:12px;font-weight:600;color:var(--text-1)">${c.autorNome}</span>
-              <div style="display:flex;align-items:center;gap:6px">
-                <span style="font-size:11px;color:var(--text-3)">${dt}</span>
-                ${podeApagar ? `<button onclick="deletarComentario(${c.id},${resumoId})" style="background:none;border:none;cursor:pointer;color:var(--text-3);font-size:12px;padding:0"><i class="ti ti-x"></i></button>` : ''}
-              </div>
-            </div>
-            <div style="font-size:13px;color:var(--text-2)">${c.corpo}</div>
-          </div>
-        </div>`;
-    }).join('');
-  } catch(e) { el.innerHTML = '<div style="font-size:12px;color:var(--text-3)">Erro ao carregar.</div>'; }
-}
-
-async function enviarComentario(resumoId) {
-  const inp = document.getElementById(`coment-inp-${resumoId}`);
-  const corpo = inp.value.trim();
-  if (!corpo) return;
-  try {
-    await apiPost(`/comentarios/${resumoId}`, { corpo });
-    inp.value = '';
-    await carregarComentarios(resumoId);
-    const count = document.getElementById(`coment-count-${resumoId}`);
-    if (count) count.textContent = parseInt(count.textContent || 0) + 1;
-  } catch(e) { toast(e.message, 'error'); }
-}
-
-async function deletarComentario(id, resumoId) {
-  try {
-    await apiDel(`/comentarios/${id}`);
-    document.getElementById(`coment-${id}`)?.remove();
-    const count = document.getElementById(`coment-count-${resumoId}`);
-    if (count) count.textContent = Math.max(0, parseInt(count.textContent || 0) - 1);
-  } catch(e) { toast(e.message, 'error'); }
-}
-
-/* ── NOTIFICAÇÕES ────────────────────────────────────────── */
-let notifPanelAberto = false;
-let naoLidas = 0;
-
-function toggleNotifPanel() {
-  const panel = document.getElementById('notif-panel');
-  notifPanelAberto = !notifPanelAberto;
-  panel.style.display = notifPanelAberto ? 'block' : 'none';
-  if (notifPanelAberto) carregarNotificacoes();
-}
-
-// fecha ao clicar fora
-document.addEventListener('click', e => {
-  if (notifPanelAberto && !document.getElementById('notif-btn').contains(e.target) && !document.getElementById('notif-panel').contains(e.target)) {
-    document.getElementById('notif-panel').style.display = 'none';
-    notifPanelAberto = false;
-  }
-});
-
-async function carregarNotificacoes() {
-  const el = document.getElementById('notif-list');
-  try {
-    const data = await apiGet('/notificacoes');
-    naoLidas = data.filter(n => !n.lida).length;
-    atualizarBadge();
-    if (!data.length) { el.innerHTML = '<div style="padding:1rem;font-size:13px;color:var(--text-3)">Nenhuma notificação ainda.</div>'; return; }
-    el.innerHTML = data.map(n => {
-      const dt = new Date(n.criadoEm).toLocaleString('pt-BR', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
-      return `<div style="padding:.7rem 1rem;border-bottom:1px solid var(--border);${n.lida?'opacity:.6':'background:var(--bg)'}">
-        <div style="font-size:13px;font-weight:${n.lida?'400':'600'};color:var(--text-1)">${n.titulo}</div>
-        ${n.corpo ? `<div style="font-size:12px;color:var(--text-2);margin-top:2px">${n.corpo}</div>` : ''}
-        <div style="font-size:11px;color:var(--text-3);margin-top:4px">${dt}</div>
-      </div>`;
-    }).join('');
-  } catch(e) { el.innerHTML = '<div style="padding:1rem;font-size:13px;color:var(--text-3)">Erro ao carregar.</div>'; }
-}
-
-function atualizarBadge() {
-  const badge = document.getElementById('notif-badge');
-  if (naoLidas > 0) {
-    badge.style.display = 'flex';
-    badge.textContent = naoLidas > 9 ? '9+' : naoLidas;
-  } else {
-    badge.style.display = 'none';
-  }
-}
-
-async function lerTodasNotif() {
-  try {
-    await apiFetch('/notificacoes/ler-todas', { method: 'PATCH' });
-    naoLidas = 0;
-    atualizarBadge();
-    await carregarNotificacoes();
-  } catch(e) {}
-}
-
-function conectarSSE() {
-  if (!token) return;
-  const evtSource = new EventSource(`${BASE_URL}/notificacoes/stream?token=${token}`);
-  evtSource.onmessage = (e) => {
-    try {
-      const notif = JSON.parse(e.data);
-      naoLidas++;
-      atualizarBadge();
-      toast(`🔔 ${notif.titulo}`, 'default');
-      if (notifPanelAberto) carregarNotificacoes();
-    } catch(_) {}
-  };
-  evtSource.onerror = () => {
-    evtSource.close();
-    // reconecta após 10s
-    setTimeout(conectarSSE, 10000);
-  };
-}
-
-/* ── DOWNLOAD COUNTER ────────────────────────────────────── */
-function registrarDownload(id) {
-  apiPost(`/materiais/${id}/download`).catch(() => {});
-}
-
-/* ── ENTREGAS ────────────────────────────────────────────── */
-const entregasLocal = new Set(); // IDs de provas já entregues
-
-async function carregarEntregaProva(provaId) {
-  // verifica via endpoint de entregas
-  try {
-    const data = await apiGet(`/provas/${provaId}/entregas`);
-    const entregou = data.some(e => e.usuario === currentUser?.usuario);
-    const btn = document.getElementById(`entrega-btn-${provaId}`);
-    if (!btn) return;
-    if (entregou) {
-      entregasLocal.add(provaId);
-      btn.classList.add('btn-primary');
-      btn.classList.remove('btn-secondary');
-      btn.innerHTML = '<i class="ti ti-circle-check-filled"></i> <span>Entregue ✓</span>';
-    }
-  } catch(_) {}
-}
-
-async function toggleEntrega(provaId) {
-  try {
-    const res = await apiPost(`/provas/${provaId}/entrega`);
-    const btn = document.getElementById(`entrega-btn-${provaId}`);
-    if (res.entregue) {
-      entregasLocal.add(provaId);
-      btn.classList.add('btn-primary');
-      btn.classList.remove('btn-secondary');
-      btn.innerHTML = '<i class="ti ti-circle-check-filled"></i> <span>Entregue ✓</span>';
-      toast('Marcado como entregue!', 'success');
-    } else {
-      entregasLocal.delete(provaId);
-      btn.classList.remove('btn-primary');
-      btn.classList.add('btn-secondary');
-      btn.innerHTML = '<i class="ti ti-circle-check"></i> <span>Entreguei</span>';
-      toast('Marcação removida.', 'default');
-    }
-  } catch(e) { toast(e.message, 'error'); }
-}
-
-(function() {
-  const banner = document.getElementById('offline-banner');
-  const text   = document.getElementById('offline-text');
-  let wasOffline = false;
-
-  function mostrar(msg, online = false) {
-    text.textContent = msg;
-    banner.className = 'visible' + (online ? ' online' : '');
-    clearTimeout(banner._t);
-    if (online) banner._t = setTimeout(() => banner.className = '', 3000);
-  }
-
-  window.addEventListener('offline', () => {
-    wasOffline = true;
-    mostrar('⚠️  Sem conexão — verifique sua internet');
-  });
-  window.addEventListener('online', () => {
-    if (wasOffline) { mostrar('✓  Conexão restaurada', true); wasOffline = false; }
-  });
-
-  if (!navigator.onLine) mostrar('⚠️  Sem conexão — verifique sua internet');
-})();
-
+/* ── HELPERS ─────────────────────────────────────────────── */
 function formatData(iso) {
   if (!iso) return '';
   const [ano,mes,dia] = iso.split('-');
