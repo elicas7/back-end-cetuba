@@ -1,83 +1,69 @@
-// server.js — Central da Turma API
-console.log("🔥 SERVER EXECUTANDO AGORA");
+// backend/server.js — Servidor principal da Central da Turma
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
-const path    = require('path');
-require('dotenv').config();
-const express = require('express');
-const cors    = require('cors');
-const app     = express();
+const express   = require('express');
+const cors      = require('cors');
+const rateLimit = require('express-rate-limit');
 
-// ── CORS ──────────────────────────────────────────────────
+const app = express();
+
+// ── Middleware global ──────────────────────────────────
 app.use(cors({
-  origin:         process.env.ALLOWED_ORIGINS?.split(',') || '*',
-  methods:        ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  origin: process.env.ALLOWED_ORIGINS?.split(',') || '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
-
-// ── BODY PARSERS ──────────────────────────────────────────
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ── FRONTEND ESTÁTICO ─────────────────────────────────────
-const frontendDir = path.resolve(__dirname, 'frontend');
+// Limite geral pra API toda (defesa extra além do limiter específico do login)
+app.use(rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 300,
+  standardHeaders: true,
+  legacyHeaders: false,
+}));
+
+// ── Frontend ───────────────────────────────────────────
+const frontendDir = path.resolve(__dirname, '../frontend');
+
 app.use(express.static(frontendDir));
-app.get('/', (req, res) => res.sendFile(path.join(frontendDir, 'index.html')));
 
-// ── UPLOADS ESTÁTICOS ─────────────────────────────────────
-const uploadsDir = path.resolve(__dirname, 'uploads');
-app.use('/uploads', express.static(uploadsDir));
-
-// ── ROTAS ─────────────────────────────────────────────────
-const authRouter      = require('./routes/auth');
-const avisosRouter    = require('./routes/avisos');
-const eventosRouter   = require('./routes/eventos');
-const materiaisRouter = require('./routes/materiais');
-const membrosRouter   = require('./routes/membros');
-const provasRouter    = require('./routes/provas');
-const resumosRouter   = require('./routes/resumos');
-const perfilRouter        = require('./routes/perfil');
-const adminRouter         = require('./routes/admin');
-const atualizacoesRouter  = require('./routes/atualizacoes');
-const bugsRouter          = require('./routes/bugs');
-const horariosRouter      = require('./routes/horarios');
-const comentariosRouter   = require('./routes/comentarios');
-const notificacoesRouter  = require('./routes/notificacoes');
-
-const register = (prefix, router) => {
-  app.use(prefix, router);
-  app.use(`/api${prefix}`, router);
-};
-
-register('/auth',      authRouter);
-register('/avisos',    avisosRouter);
-register('/eventos',   eventosRouter);
-register('/materiais', materiaisRouter);
-register('/membros',   membrosRouter);
-register('/provas',    provasRouter);
-register('/resumos',   resumosRouter);
-register('/perfil',        perfilRouter);
-register('/admin',         adminRouter);
-register('/atualizacoes',  atualizacoesRouter);
-register('/bugs',          bugsRouter);
-register('/horarios',      horariosRouter);
-register('/comentarios',   comentariosRouter);
-register('/notificacoes',  notificacoesRouter);
-
-// ── HEALTH ────────────────────────────────────────────────
-app.get('/health', (req, res) => res.json({ ok: true, ts: new Date() }));
-app.get('/test-db', async (req, res) => {
-  try {
-    const pool = require('./db');
-    const result = await pool.query('SELECT NOW()');
-    res.json({ ok: true, time: result.rows[0] });
-  } catch (err) {
-    res.status(500).json({ ok: false, error: err.message });
-  }
+app.get('/', (req, res) => {
+  res.sendFile(path.join(frontendDir, 'index.html'));
 });
 
-// ── 404 ───────────────────────────────────────────────────
+// ── Arquivos estáticos (uploads) ───────────────────────
+const uploadsDir = path.resolve(__dirname, '../', process.env.UPLOADS_DIR || './backend/uploads/materiais');
+app.use('/uploads', express.static(uploadsDir));
+
+// ── Rotas da API ───────────────────────────────────────
+app.use('/auth',      require('./routes/auth'));
+app.use('/avisos',    require('./routes/avisos'));
+app.use('/materiais', require('./routes/materiais'));
+app.use('/resumos',   require('./routes/resumos'));
+app.use('/provas',    require('./routes/provas'));
+app.use('/eventos',   require('./routes/eventos'));
+app.use('/membros',   require('./routes/membros'));
+
+// ── Health check ───────────────────────────────────────
+app.get('/health', (req, res) => res.json({ ok: true, ts: new Date() }));
+
+// ── 404 ────────────────────────────────────────────────
 app.use((req, res) => res.status(404).json({ message: 'Rota não encontrada.' }));
 
-// ── START ─────────────────────────────────────────────────
+// ── Error handler ──────────────────────────────────────
+app.use((err, req, res, _next) => {
+  console.error('Erro:', err.message);
+  res.status(err.status || 500).json({ message: err.message || 'Erro interno do servidor.' });
+});
+
+// ── Inicialização ──────────────────────────────────────
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 API rodando na porta ${PORT}`));
+app.listen(PORT, () => {
+  const dbUrl = process.env.DATABASE_URL?.replace(/:\/\/.*@/, '://***@') || 'não configurado';
+  console.log(`\n🚀  Central da Turma API rodando em http://localhost:${PORT}`);
+  console.log(`    Banco: ${dbUrl}`);
+  console.log(`    Env:   ${process.env.NODE_ENV || 'development'}\n`);
+});
