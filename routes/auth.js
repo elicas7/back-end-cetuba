@@ -1,12 +1,23 @@
-// routes/auth.js
+// backend/routes/auth.js
 const router = require('express').Router();
 const bcrypt = require('bcryptjs');
 const jwt    = require('jsonwebtoken');
+const rateLimit = require('express-rate-limit');
 const pool   = require('../db');
 const { auth, soDev } = require('../middleware/auth');
 
+// Limita tentativas de login: 10 por 15 min por IP, pra dificultar força bruta
+// contra as senhas (lembrando que a senha padrão do seed é "123456").
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'Muitas tentativas de login. Tente novamente em alguns minutos.' },
+});
+
 // POST /auth/login
-router.post('/login', async (req, res) => {
+router.post('/login', loginLimiter, async (req, res) => {
   const { usuario, senha } = req.body;
   if (!usuario || !senha) return res.status(400).json({ message: 'Preencha usuário e senha.' });
   try {
@@ -20,19 +31,11 @@ router.post('/login', async (req, res) => {
     if (!user || !(await bcrypt.compare(senha, user.senha_hash))) {
       return res.status(401).json({ message: 'Usuário ou senha incorretos.' });
     }
-    // Atualiza último login
-    await pool.query(`UPDATE usuarios SET ultimo_login = NOW() WHERE id = $1`, [user.id]);
-
     const payload = { id: user.id, usuario: user.usuario, role: user.role, turma_id: user.turma_id };
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '7d' });
     return res.json({
       token,
-      user: {
-        id: user.id, nome: user.nome, usuario: user.usuario,
-        role: user.role, iniciais: user.iniciais,
-        turma_id: user.turma_id, turma_nome: user.turma_nome,
-        avatar_url: user.avatar_url, bio: user.bio,
-      },
+      user: { id: user.id, nome: user.nome, usuario: user.usuario, role: user.role, iniciais: user.iniciais, turma_id: user.turma_id, turma_nome: user.turma_nome },
     });
   } catch (err) {
     console.error('Login:', err);
@@ -44,8 +47,7 @@ router.post('/login', async (req, res) => {
 router.get('/me', auth, async (req, res) => {
   try {
     const { rows } = await pool.query(
-      `SELECT u.id, u.nome, u.usuario, u.role, u.iniciais, u.bio, u.avatar_url,
-              u.turma_id, t.nome AS turma_nome, u.ultimo_login AS "ultimoLogin"
+      `SELECT u.id, u.nome, u.usuario, u.role, u.iniciais, u.turma_id, t.nome AS turma_nome
          FROM usuarios u LEFT JOIN turmas t ON t.id = u.turma_id WHERE u.id = $1`,
       [req.user.id]
     );
@@ -59,11 +61,13 @@ router.post('/criar-conta', auth, soDev, async (req, res) => {
   const { nome, usuario, senha, role = 'aluno' } = req.body;
   if (!nome || !usuario || !senha) return res.status(400).json({ message: 'Nome, usuário e senha são obrigatórios.' });
   if (senha.length < 6) return res.status(400).json({ message: 'Senha deve ter ao menos 6 caracteres.' });
+
   const rolesValidas = ['aluno', 'sub_lider', 'lider', 'ajudante_dev', 'dev'];
   if (!rolesValidas.includes(role)) return res.status(400).json({ message: 'Cargo inválido.' });
+
   try {
     const senha_hash = await bcrypt.hash(senha, 10);
-    const ini = nome.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase();
+    const ini = nome.split(' ').slice(0,2).map(n=>n[0]).join('').toUpperCase();
     const { rows } = await pool.query(
       `INSERT INTO usuarios (nome, usuario, senha_hash, role, iniciais, turma_id)
        VALUES ($1, $2, $3, $4, $5, $6)
@@ -74,6 +78,32 @@ router.post('/criar-conta', auth, soDev, async (req, res) => {
   } catch (err) {
     if (err.code === '23505') return res.status(409).json({ message: 'Usuário já existe.' });
     console.error('Criar conta:', err);
+    return res.status(500).json({ message: 'Erro interno.' });
+  }
+});
+
+// PUT /auth/senha — o próprio usuário troca sua senha
+router.put('/senha', auth, async (req, res) => {
+  const { senhaAtual, novaSenha } = req.body;
+  if (!senhaAtual || !novaSenha) {
+    return res.status(400).json({ message: 'Informe a senha atual e a nova senha.' });
+  }
+  if (novaSenha.length < 6) {
+    return res.status(400).json({ message: 'A nova senha deve ter ao menos 6 caracteres.' });
+  }
+
+  try {
+    const { rows } = await pool.query('SELECT senha_hash FROM usuarios WHERE id = $1', [req.user.id]);
+    const user = rows[0];
+    if (!user || !(await bcrypt.compare(senhaAtual, user.senha_hash))) {
+      return res.status(401).json({ message: 'Senha atual incorreta.' });
+    }
+
+    const novoHash = await bcrypt.hash(novaSenha, 10);
+    await pool.query('UPDATE usuarios SET senha_hash = $1 WHERE id = $2', [novoHash, req.user.id]);
+    return res.json({ ok: true, message: 'Senha alterada com sucesso.' });
+  } catch (err) {
+    console.error('Trocar senha:', err);
     return res.status(500).json({ message: 'Erro interno.' });
   }
 });
