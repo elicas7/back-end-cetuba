@@ -1,6 +1,6 @@
 // backend/server.js — Servidor principal da Central da Turma
 const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
 const express   = require('express');
 const cors      = require('cors');
@@ -26,7 +26,7 @@ app.use(rateLimit({
 }));
 
 // ── Frontend ───────────────────────────────────────────
-const frontendDir = path.resolve(__dirname, '../frontend');
+const frontendDir = path.resolve(__dirname, 'frontend');
 
 app.use(express.static(frontendDir));
 
@@ -35,7 +35,7 @@ app.get('/', (req, res) => {
 });
 
 // ── Arquivos estáticos (uploads) ───────────────────────
-const uploadsDir = path.resolve(__dirname, '../', process.env.UPLOADS_DIR || './backend/uploads/materiais');
+const uploadsDir = path.resolve(__dirname, process.env.UPLOADS_DIR || './uploads/materiais');
 app.use('/uploads', express.static(uploadsDir));
 
 // ── Rotas da API ───────────────────────────────────────
