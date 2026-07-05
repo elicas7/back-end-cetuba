@@ -36,6 +36,9 @@ app.get('/', (req, res) => {
 
 // ── Arquivos estáticos (uploads) ───────────────────────
 const uploadsDir = path.resolve(__dirname, process.env.UPLOADS_DIR || './uploads/materiais');
+// Avatares ficam em uploads/avatares (pasta separada dos materiais),
+// então precisam de um mount próprio antes do genérico abaixo.
+app.use('/uploads/avatares', express.static(path.resolve(__dirname, 'uploads/avatares')));
 app.use('/uploads', express.static(uploadsDir));
 
 // ── Rotas da API ───────────────────────────────────────
@@ -46,6 +49,7 @@ app.use('/resumos',   require('./routes/resumos'));
 app.use('/provas',    require('./routes/provas'));
 app.use('/eventos',   require('./routes/eventos'));
 app.use('/membros',   require('./routes/membros'));
+app.use('/perfil',    require('./routes/perfil'));
 
 // ── Health check ───────────────────────────────────────
 app.get('/health', (req, res) => res.json({ ok: true, ts: new Date() }));
