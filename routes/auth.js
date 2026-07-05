@@ -35,7 +35,7 @@ router.post('/login', loginLimiter, async (req, res) => {
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '7d' });
     return res.json({
       token,
-      user: { id: user.id, nome: user.nome, usuario: user.usuario, role: user.role, iniciais: user.iniciais, turma_id: user.turma_id, turma_nome: user.turma_nome },
+      user: { id: user.id, nome: user.nome, usuario: user.usuario, role: user.role, iniciais: user.iniciais, turma_id: user.turma_id, turma_nome: user.turma_nome, bio: user.bio, avatar_url: user.avatar_url },
     });
   } catch (err) {
     console.error('Login:', err);
@@ -47,7 +47,7 @@ router.post('/login', loginLimiter, async (req, res) => {
 router.get('/me', auth, async (req, res) => {
   try {
     const { rows } = await pool.query(
-      `SELECT u.id, u.nome, u.usuario, u.role, u.iniciais, u.turma_id, t.nome AS turma_nome
+      `SELECT u.id, u.nome, u.usuario, u.role, u.iniciais, u.turma_id, u.bio, u.avatar_url, t.nome AS turma_nome
          FROM usuarios u LEFT JOIN turmas t ON t.id = u.turma_id WHERE u.id = $1`,
       [req.user.id]
     );
