@@ -514,6 +514,16 @@ textarea.inp { resize: vertical; line-height: 1.6; }
 .credits-role  { font-size: 11px; color: var(--text-2); margin-top: 2px; }
 .credits-version { text-align: center; color: var(--text-3); font-size: 12px; padding: 1rem 0; }
 
+/* ─── AVATAR (foto real, quando existir) ─────────────────── */
+.avatar-img { object-fit: cover; display: block; }
+.perfil-avatar-row { display: flex; align-items: center; gap: 16px; margin-bottom: 4px; }
+.perfil-avatar-big {
+  width: 72px; height: 72px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; font-weight: 700; background: var(--primary-light); color: var(--primary);
+}
+.perfil-bio-count { font-size: 11px; color: var(--text-3); text-align: right; margin-top: 4px; }
+
 /* ─── CRIAR CONTA (somente dev) ──────────────────────────── */
 .criar-conta-form .form-group { margin-bottom: 1rem; }
 .criar-conta-form label { display: block; font-size: 12px; font-weight: 600; color: var(--text-2); margin-bottom: 5px; text-transform: uppercase; letter-spacing: .04em; }
@@ -1155,6 +1165,25 @@ body.dark .aula-qui,.dark .aula-ed,.dark .aula-fil,.dark .aula-ing,.dark .aula-a
         </div>
 
         <div class="config-section">
+          <h3>Perfil</h3>
+          <div class="perfil-avatar-row">
+            <div class="perfil-avatar-big" id="perfil-avatar-preview">--</div>
+            <div>
+              <input type="file" id="perfil-avatar-input" accept="image/*" class="hidden" onchange="enviarAvatar(this.files[0])" />
+              <button class="btn-primary" onclick="document.getElementById('perfil-avatar-input').click()"><i class="ti ti-camera"></i> Trocar foto</button>
+              <div class="cr-desc" style="margin-top:6px">JPG ou PNG, até 2 MB</div>
+            </div>
+          </div>
+
+          <div style="margin-top:1.25rem">
+            <label style="display:block;font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em">Sobre mim</label>
+            <textarea class="inp" id="perfil-bio" rows="3" maxlength="300" placeholder="Conte um pouco sobre você..." oninput="document.getElementById('perfil-bio-count').textContent = this.value.length + '/300'"></textarea>
+            <div class="perfil-bio-count" id="perfil-bio-count">0/300</div>
+            <button class="btn-primary" style="margin-top:8px" onclick="salvarBio()"><i class="ti ti-check"></i> Salvar descrição</button>
+          </div>
+        </div>
+
+        <div class="config-section">
           <h3>Trocar senha</h3>
           <div class="form-row form-row-2">
             <div>
@@ -1264,6 +1293,35 @@ const apiPost = (ep, b)  => apiFetch(ep, { method: 'POST',   body: JSON.stringif
 const apiPut  = (ep, b)  => apiFetch(ep, { method: 'PUT',    body: JSON.stringify(b) });
 const apiDel  = ep       => apiFetch(ep, { method: 'DELETE' });
 
+// Upload de arquivo (multipart) — não usa apiFetch pois esta força
+// Content-Type: application/json e faz JSON.stringify do body.
+async function apiUpload(endpoint, formData) {
+  const headers = {};
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  const res = await fetch(BASE_URL + endpoint, { method: 'POST', headers, body: formData });
+  if (res.status === 401) { doLogout(); throw new Error('Sessão expirada'); }
+  if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.message || 'Erro no upload.'); }
+  return res.json();
+}
+
+/* ── Avatar (foto real ou iniciais) ───────────────────────
+   Usado em toda parte que hoje mostra as iniciais do usuário,
+   pra já exibir a foto de perfil quando ela existir. */
+function avatarHtml(m, cls) {
+  if (m && m.avatar_url) {
+    return `<img src="${BASE_URL}${m.avatar_url}" class="${cls} avatar-img" alt="">`;
+  }
+  return `<div class="${cls}">${escapeHtml(iniciais(m?.nome || ''))}</div>`;
+}
+function setAvatarEl(el, m) {
+  if (!el) return;
+  if (m && m.avatar_url) {
+    el.innerHTML = `<img src="${BASE_URL}${m.avatar_url}" class="avatar-img" style="width:100%;height:100%;border-radius:50%" alt="">`;
+  } else {
+    el.textContent = m?.iniciais || iniciais(m?.nome || '');
+  }
+}
+
 /* ── Toast ──────────────────────────────────────────────── */
 function toast(msg, type = 'default') {
   const el = document.getElementById('toast');
@@ -1323,19 +1381,21 @@ function initApp() {
 
   const first = currentUser.nome.split(' ')[0];
   document.getElementById('sb-name').textContent = currentUser.nome;
-  document.getElementById('sb-avatar').textContent = currentUser.iniciais || iniciais(currentUser.nome);
+  setAvatarEl(document.getElementById('sb-avatar'), currentUser);
   document.getElementById('welcome-msg').textContent = `Olá, ${first}! 👋`;
 
   const nomeCargo = NOME_CARGO[currentUser.role] || currentUser.role;
   document.getElementById('sb-role').textContent = nomeCargo;
   document.getElementById('admin-role-desc').textContent = nomeCargo;
 
-  // Avatar cor por cargo
+  // Avatar cor por cargo (só aplica quando não há foto real)
   const avatarColors = { dev:'#7c3aed', ajudante_dev:'#0891b2', lider:'#1a56db', sub_lider:'#6d28d9', aluno:'#374151' };
   const avatarBgs    = { dev:'#ede9fe', ajudante_dev:'#cffafe', lider:'#dbeafe', sub_lider:'#ede9fe', aluno:'#f3f4f6' };
   const sbAv = document.getElementById('sb-avatar');
-  sbAv.style.background = avatarBgs[currentUser.role] || '#eff6ff';
-  sbAv.style.color = avatarColors[currentUser.role] || '#1a56db';
+  if (!currentUser.avatar_url) {
+    sbAv.style.background = avatarBgs[currentUser.role] || '#eff6ff';
+    sbAv.style.color = avatarColors[currentUser.role] || '#1a56db';
+  }
 
   // Nav: admin aparece para vice-lider pra cima
   const showAdmin = podeEditar();
@@ -1398,6 +1458,10 @@ function abrirConfiguracoes() {
   const cfgCargo = document.getElementById('cfg-cargo');
   cfgCargo.textContent  = NOME_CARGO[currentUser.role] || currentUser.role;
   cfgCargo.className    = 'tag ' + (TAG_CARGO[currentUser.role] || 'cargo-aluno');
+
+  setAvatarEl(document.getElementById('perfil-avatar-preview'), currentUser);
+  document.getElementById('perfil-bio').value = currentUser.bio || '';
+  document.getElementById('perfil-bio-count').textContent = (currentUser.bio || '').length + '/300';
 }
 
 /* ── CARREGAMENTO GERAL ─────────────────────────────────── */
@@ -1836,7 +1900,7 @@ async function carregarMembros() {
     tbody.innerHTML = data.map(m => `
       <tr>
         <td>
-          <span class="member-avatar">${escapeHtml(iniciais(m.nome))}</span>
+          ${avatarHtml(m, 'member-avatar')}
           ${escapeHtml(m.nome)} <span style="color:var(--text-3);font-size:11px">(${escapeHtml(m.usuario)})</span>
         </td>
         <td><span class="tag ${TAG_CARGO[m.role]||'cargo-aluno'}">${NOME_CARGO[m.role]||m.role}</span></td>
@@ -1872,7 +1936,7 @@ async function carregarLideranca() {
 
     if (lider) cards.innerHTML += `
       <div class="lider-card lider-principal">
-        <div class="lider-avatar">${escapeHtml(iniciais(lider.nome))}</div>
+        ${avatarHtml(lider, 'lider-avatar')}
         <div class="lider-nome">${escapeHtml(lider.nome)}</div>
         <div class="lider-cargo">@${escapeHtml(lider.usuario)}</div>
         <div class="lider-badge"><i class="ti ti-shield-star" style="font-size:14px"></i> Líder da Sala</div>
@@ -1880,7 +1944,7 @@ async function carregarLideranca() {
 
     if (vice) cards.innerHTML += `
       <div class="lider-card lider-vice">
-        <div class="lider-avatar">${escapeHtml(iniciais(vice.nome))}</div>
+        ${avatarHtml(vice, 'lider-avatar')}
         <div class="lider-nome">${escapeHtml(vice.nome)}</div>
         <div class="lider-cargo">@${escapeHtml(vice.usuario)}</div>
         <div class="lider-badge"><i class="ti ti-shield-half" style="font-size:14px"></i> Vice-líder da Sala</div>
@@ -1893,7 +1957,7 @@ async function carregarLideranca() {
     tbody.innerHTML = data.map(m => `
       <tr>
         <td>
-          <span class="member-avatar">${escapeHtml(iniciais(m.nome))}</span>
+          ${avatarHtml(m, 'member-avatar')}
           ${escapeHtml(m.nome)}
         </td>
         <td><span class="tag ${TAG_CARGO[m.role]||'cargo-aluno'}">${NOME_CARGO[m.role]||m.role}</span></td>
@@ -1910,8 +1974,11 @@ async function carregarCreditos() {
     const avatarBgs    = { dev:'#ede9fe', ajudante_dev:'#cffafe', lider:'#dbeafe', sub_lider:'#ede9fe', aluno:'#f3f4f6' };
 
     function creditCard(m) {
+      const avatar = m.avatar_url
+        ? `<img src="${BASE_URL}${m.avatar_url}" class="credits-avatar avatar-img" alt="">`
+        : `<div class="credits-avatar" style="background:${avatarBgs[m.role]||'#eff6ff'};color:${avatarColors[m.role]||'#1a56db'}">${escapeHtml(iniciais(m.nome))}</div>`;
       return `<div class="credits-person">
-        <div class="credits-avatar" style="background:${avatarBgs[m.role]||'#eff6ff'};color:${avatarColors[m.role]||'#1a56db'}">${escapeHtml(iniciais(m.nome))}</div>
+        ${avatar}
         <div>
           <div class="credits-name">${escapeHtml(m.nome)}</div>
           <div class="credits-role">${NOME_CARGO[m.role]||m.role}</div>
@@ -1961,6 +2028,37 @@ async function trocarSenha() {
     document.getElementById('senha-atual').value = '';
     document.getElementById('senha-nova').value = '';
   } catch(e) { toast(e.message, 'error'); }
+}
+
+/* ── PERFIL (bio + foto) ─────────────────────────────────── */
+async function enviarAvatar(file) {
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { toast('Envie apenas imagens.', 'error'); return; }
+  if (file.size > 2 * 1024 * 1024) { toast('A imagem deve ter até 2 MB.', 'error'); return; }
+  const fd = new FormData();
+  fd.append('avatar', file);
+  try {
+    const { avatar_url } = await apiUpload('/perfil/me/avatar', fd);
+    currentUser.avatar_url = avatar_url;
+    setAvatarEl(document.getElementById('perfil-avatar-preview'), currentUser);
+    setAvatarEl(document.getElementById('sb-avatar'), currentUser);
+    toast('Foto de perfil atualizada!', 'success');
+  } catch (e) {
+    toast(e.message, 'error');
+  } finally {
+    document.getElementById('perfil-avatar-input').value = '';
+  }
+}
+
+async function salvarBio() {
+  const bio = document.getElementById('perfil-bio').value.trim();
+  try {
+    const atualizado = await apiPut('/perfil/me', { bio });
+    currentUser.bio = atualizado.bio;
+    toast('Descrição salva!', 'success');
+  } catch (e) {
+    toast(e.message, 'error');
+  }
 }
 
 /* ── CALENDÁRIO ──────────────────────────────────────────── */
