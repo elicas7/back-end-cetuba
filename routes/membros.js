@@ -7,7 +7,7 @@ const { auth, podeLiderar } = require('../middleware/auth');
 router.get('/', auth, async (req, res) => {
   try {
     const { rows } = await pool.query(
-      `SELECT id, nome, usuario, role, iniciais, criado_em AS "criadoEm"
+      `SELECT id, nome, usuario, role, iniciais, avatar_url, criado_em AS "criadoEm"
          FROM usuarios
         WHERE turma_id = $1
         ORDER BY CASE role
