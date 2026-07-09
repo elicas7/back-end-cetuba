@@ -2,6 +2,7 @@
 const router = require('express').Router();
 const pool   = require('../db');
 const { auth, podeEditar } = require('../middleware/auth');
+const { criarNotificacao } = require('./notificacoes');
 
 // GET /provas
 router.get('/', auth, async (req, res) => {
@@ -33,6 +34,12 @@ router.post('/', auth, podeEditar, async (req, res) => {
        RETURNING id, disciplina, data::text AS data, horario::text AS horario, conteudo`,
       [disciplina, data, horario || null, conteudo || null, req.user.turma_id]
     );
+    criarNotificacao(pool, {
+      turmaId: req.user.turma_id,
+      tipo: 'prova',
+      titulo: '📝 Nova prova marcada',
+      corpo: `${disciplina} — ${data}`,
+    });
     return res.status(201).json(rows[0]);
   } catch (err) {
     console.error(err);
