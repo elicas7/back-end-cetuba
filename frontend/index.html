@@ -213,6 +213,22 @@ body {
 .notif-item-corpo { color: var(--text-2); font-size: 12px; margin-top: 1px; }
 .notif-item-tempo { color: var(--text-3); font-size: 11px; margin-top: 3px; }
 .notif-empty { padding: 24px 14px; text-align: center; color: var(--text-3); font-size: 13px; }
+
+/* ─── BUGS ────────────────────────────────────────────────── */
+.bug-item { padding: 12px 0; border-bottom: 1px solid var(--border-soft); }
+.bug-item:last-child { border-bottom: none; }
+.bug-item-top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+.bug-status-select {
+  font-size: 11px; font-weight: 600; border: 1px solid var(--border); border-radius: 999px;
+  padding: 3px 8px; background: var(--surface); color: var(--text-1); cursor: pointer;
+}
+.bug-delete {
+  margin-left: auto; border: none; background: none; color: var(--danger); cursor: pointer;
+  font-size: 15px; padding: 2px 4px;
+}
+.bug-item-titulo { font-weight: 600; font-size: 14px; color: var(--text-1); }
+.bug-item-desc { font-size: 13px; color: var(--text-2); margin-top: 3px; line-height: 1.5; }
+.bug-item-meta { display: flex; gap: 12px; flex-wrap: wrap; font-size: 11px; color: var(--text-3); margin-top: 6px; }
 .aviso-item.nao-lido { border-left: 3px solid var(--primary, #1a56db); }
 .aviso-item .btn-marcar-lido {
   font-size: 11px; font-weight: 600; color: var(--primary, #1a56db);
@@ -771,6 +787,7 @@ body.dark .aula-qui,.dark .aula-ed,.dark .aula-fil,.dark .aula-ing,.dark .aula-a
         <div class="nav-section">Turma</div>
         <div class="nav-item" onclick="navTo('lideranca',this)"><i class="ti ti-shield-star"></i> Liderança</div>
         <div class="nav-item" onclick="navTo('creditos',this)"><i class="ti ti-award"></i> Créditos</div>
+        <div class="nav-item" onclick="navTo('bugs',this)"><i class="ti ti-bug"></i> Reportar bug <span class="nav-badge hidden" id="badge-bugs-nav">0</span></div>
         <div class="nav-section hidden" id="nav-admin-section">Administração</div>
         <div class="nav-item hidden" id="nav-admin" onclick="navTo('admin',this)"><i class="ti ti-settings-2"></i> Painel Admin</div>
         <div class="nav-item hidden" id="nav-criar-conta" onclick="navTo('criar-conta',this)"><i class="ti ti-user-plus"></i> Criar conta</div>
@@ -1018,6 +1035,49 @@ body.dark .aula-qui,.dark .aula-ed,.dark .aula-fil,.dark .aula-ing,.dark .aula-a
             <div id="credits-ajuda"></div>
           </div>
           <div class="credits-version">Central da Turma v2.0 · 7º Ano · 2026</div>
+        </div>
+      </div>
+
+      <!-- ── BUGS ────────────────────────────── -->
+      <div class="page" id="page-bugs">
+        <div class="page-header">
+          <div class="page-title">Reportar um bug</div>
+          <div class="page-sub">Encontrou algo quebrado ou estranho? Conta pra gente.</div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <div class="form-field">
+              <label>Título</label>
+              <input class="inp" id="bug-titulo" maxlength="150" placeholder="Ex: Botão de salvar não funciona" />
+            </div>
+            <div class="form-field">
+              <label>Onde aconteceu? (opcional)</label>
+              <input class="inp" id="bug-pagina" maxlength="100" placeholder="Ex: Tela de Resumos" />
+            </div>
+            <div class="form-field">
+              <label>Descreva o problema</label>
+              <textarea class="inp" id="bug-descricao" rows="4" maxlength="1000" placeholder="O que você estava fazendo quando aconteceu?"></textarea>
+            </div>
+            <div class="form-field">
+              <label>Prioridade</label>
+              <select class="inp" id="bug-prioridade">
+                <option value="baixo">Baixa</option>
+                <option value="medio" selected>Média</option>
+                <option value="alto">Alta</option>
+                <option value="critico">Crítica</option>
+              </select>
+            </div>
+            <button class="btn-primary" onclick="enviarBug()"><i class="ti ti-send"></i> Enviar relatório</button>
+          </div>
+        </div>
+
+        <div class="card hidden" id="bugs-gerenciar-card" style="margin-top:1.25rem">
+          <div class="card-header">
+            <span class="ch-title">Bugs reportados <span class="nav-badge hidden" id="badge-bugs-card">0</span></span>
+          </div>
+          <div class="card-body" id="bugs-lista">
+            <div class="notif-empty">Carregando...</div>
+          </div>
         </div>
       </div>
 
@@ -1564,6 +1624,10 @@ function navTo(id, el) {
   if (id === 'creditos')  carregarCreditos();
   if (id === 'configuracoes') abrirConfiguracoes();
   if (id === 'horarios')  carregarHorarios();
+  if (id === 'bugs') {
+    document.getElementById('bugs-gerenciar-card').classList.toggle('hidden', !podeVerBugs());
+    if (podeVerBugs()) carregarBugs();
+  }
 }
 
 /* ── CONFIGURAÇÕES ──────────────────────────────────────── */
@@ -1583,10 +1647,12 @@ function abrirConfiguracoes() {
 
 /* ── CARREGAMENTO GERAL ─────────────────────────────────── */
 async function carregarDados() {
-  await Promise.allSettled([
+  const tarefas = [
     carregarEventos(), carregarAvisos(), carregarMateriais(),
     carregarResumos(), carregarProvas(), carregarMembros(),
-  ]);
+  ];
+  if (podeVerBugs()) tarefas.push(carregarBugs());
+  await Promise.allSettled(tarefas);
 }
 
 /* ── EVENTOS ─────────────────────────────────────────────── */
@@ -2342,6 +2408,84 @@ function discTag(disc) {
     'Artes':'tag-amber','Inglês':'tag-gray'
   };
   return map[disc] || 'tag-gray';
+}
+
+/* ── BUGS ─────────────────────────────────────────────────── */
+function podeVerBugs() { return currentUser?.role === 'dev' || currentUser?.role === 'ajudante_dev'; }
+function corPrioridadeBug(p) { return { critico:'tag-red', alto:'tag-orange', medio:'tag-amber', baixo:'tag-gray' }[p] || 'tag-gray'; }
+function labelPrioridadeBug(p) { return { critico:'Crítica', alto:'Alta', medio:'Média', baixo:'Baixa' }[p] || p; }
+function labelStatusBug(s) { return { aberto:'Aberto', em_analise:'Em análise', resolvido:'Resolvido', ignorado:'Ignorado' }[s] || s; }
+
+async function enviarBug() {
+  const titulo     = document.getElementById('bug-titulo').value.trim();
+  const pagina     = document.getElementById('bug-pagina').value.trim();
+  const descricao  = document.getElementById('bug-descricao').value.trim();
+  const prioridade = document.getElementById('bug-prioridade').value;
+  if (!titulo || !descricao) { toast('Preencha o título e a descrição.', 'error'); return; }
+  try {
+    await apiPost('/bugs', { titulo, descricao, pagina: pagina || null, prioridade });
+    toast('Bug reportado! Obrigado por avisar 🙏', 'success');
+    document.getElementById('bug-titulo').value = '';
+    document.getElementById('bug-pagina').value = '';
+    document.getElementById('bug-descricao').value = '';
+    document.getElementById('bug-prioridade').value = 'medio';
+    if (podeVerBugs()) carregarBugs();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function carregarBugs() {
+  try {
+    const bugs = await apiGet('/bugs');
+    renderBugs(bugs);
+    const abertos = bugs.filter(b => b.status === 'aberto').length;
+    ['badge-bugs-nav', 'badge-bugs-card'].forEach(id => {
+      const el = document.getElementById(id);
+      el.textContent = abertos > 9 ? '9+' : abertos;
+      el.classList.toggle('hidden', abertos === 0);
+    });
+  } catch (e) {
+    document.getElementById('bugs-lista').innerHTML = '<div class="notif-empty">Não foi possível carregar os bugs.</div>';
+  }
+}
+
+function renderBugs(bugs) {
+  const el = document.getElementById('bugs-lista');
+  if (!bugs.length) { el.innerHTML = '<div class="notif-empty">Nenhum bug reportado. 🎉</div>'; return; }
+  el.innerHTML = bugs.map(b => `
+    <div class="bug-item">
+      <div class="bug-item-top">
+        <span class="tag ${corPrioridadeBug(b.prioridade)}">${labelPrioridadeBug(b.prioridade)}</span>
+        <select class="bug-status-select" onchange="atualizarStatusBug(${b.id}, this.value)">
+          ${['aberto','em_analise','resolvido','ignorado'].map(s => `<option value="${s}" ${s === b.status ? 'selected' : ''}>${labelStatusBug(s)}</option>`).join('')}
+        </select>
+        ${isDev() ? `<button class="bug-delete" onclick="excluirBug(${b.id})" title="Excluir"><i class="ti ti-trash"></i></button>` : ''}
+      </div>
+      <div class="bug-item-titulo">${escapeHtml(b.titulo)}</div>
+      <div class="bug-item-desc">${escapeHtml(b.descricao)}</div>
+      <div class="bug-item-meta">
+        ${b.pagina ? `<span><i class="ti ti-map-pin"></i> ${escapeHtml(b.pagina)}</span>` : ''}
+        <span>${escapeHtml(b.autorNome || 'Anônimo')}</span>
+        <span>${tempoRelativo(b.criadoEm)}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function atualizarStatusBug(id, status) {
+  try {
+    await apiFetch(`/bugs/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) });
+    toast('Status atualizado.', 'success');
+    carregarBugs();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function excluirBug(id) {
+  if (!confirm('Excluir este bug permanentemente?')) return;
+  try {
+    await apiDel(`/bugs/${id}`);
+    toast('Bug excluído.', 'success');
+    carregarBugs();
+  } catch (e) { toast(e.message, 'error'); }
 }
 </script>
 </body>
