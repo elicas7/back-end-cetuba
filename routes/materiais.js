@@ -5,6 +5,7 @@ const path   = require('path');
 const fs     = require('fs');
 const pool   = require('../db');
 const { auth, podeEditar } = require('../middleware/auth');
+const { criarNotificacao } = require('./notificacoes');
 
 const uploadsDir = process.env.UPLOADS_DIR || './uploads';
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
@@ -61,6 +62,12 @@ router.post('/', auth, podeEditar, upload.single('file'), async (req, res) => {
        RETURNING id, nome, disciplina, tipo, tamanho, url_arquivo AS url, criado_em AS "criadoEm"`,
       [nomeArquivo, disciplina, guessType(ext), req.file.size, `/uploads/${req.file.filename}`, req.user.id, req.user.turma_id]
     );
+    criarNotificacao(pool, {
+      turmaId: req.user.turma_id,
+      tipo: 'material',
+      titulo: '📎 Novo material disponível',
+      corpo: `${nomeArquivo} (${disciplina})`,
+    });
     return res.status(201).json(rows[0]);
   } catch (err) { return res.status(500).json({ message: 'Erro ao salvar material.' }); }
 });
