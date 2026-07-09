@@ -2,6 +2,7 @@
 const router = require('express').Router();
 const pool   = require('../db');
 const { auth, podeEditar } = require('../middleware/auth');
+const { criarNotificacao } = require('./notificacoes');
 
 // GET /eventos — retorna eventos futuros (padrão: próximos 60 dias)
 router.get('/', auth, async (req, res) => {
@@ -38,6 +39,12 @@ router.post('/', auth, podeEditar, async (req, res) => {
        RETURNING id, titulo, TO_CHAR(data, 'YYYY-MM-DD') AS data, tipo, descricao`,
       [titulo, data, tipo, descricao || null, req.user.turma_id]
     );
+    criarNotificacao(pool, {
+      turmaId: req.user.turma_id,
+      tipo: 'evento',
+      titulo: '📅 Novo evento na agenda',
+      corpo: `${titulo} — ${data}`,
+    });
     return res.status(201).json(rows[0]);
   } catch (err) {
     console.error(err);
