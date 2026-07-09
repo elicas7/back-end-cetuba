@@ -331,6 +331,12 @@ tr:hover td { background: var(--bg); }
 .aula-ing  { background: #f5f3ff; color: #3730a3; }
 .aula-art  { background: #fff7ed; color: #92400e; }
 .aula-cie  { background: #dcfce7; color: #14532d; }
+.aula-outro { background: var(--surface-2); color: var(--text-1); }
+.sc-cell input {
+  width: 100%; border: 1px solid var(--border); border-radius: 6px; background: var(--surface);
+  color: inherit; font: inherit; font-weight: 600; text-align: center; padding: 4px 3px;
+}
+.sc-cell.sc-time input { font-weight: 600; font-size: 10px; padding: 3px; }
 .legend-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: .75rem; }
 
 /* ─── MATERIAIS ──────────────────────────────────────────── */
@@ -834,64 +840,25 @@ body.dark .aula-qui,.dark .aula-ed,.dark .aula-fil,.dark .aula-ing,.dark .aula-a
 
       <!-- ── HORÁRIOS ────────────────────────── -->
       <div class="page" id="page-horarios">
-        <div class="page-header">
-          <div class="page-title">Horários das aulas</div>
-          <div class="page-sub">Grade semanal — 7º Ano · 2026</div>
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+          <div>
+            <div class="page-title">Horários das aulas</div>
+            <div class="page-sub">Grade semanal — 7º Ano · 2026</div>
+          </div>
+          <div id="horarios-actions" style="display:flex;gap:8px">
+            <button class="btn-primary hidden" id="btn-editar-horarios" onclick="iniciarEdicaoHorario()"><i class="ti ti-edit"></i> Editar horários</button>
+            <button class="btn-secondary hidden" id="btn-cancelar-horarios" onclick="cancelarEdicaoHorario()">Cancelar</button>
+            <button class="btn-primary hidden" id="btn-salvar-horarios" onclick="salvarHorarios()"><i class="ti ti-check"></i> Salvar</button>
+          </div>
         </div>
         <div class="card">
           <div class="card-body" style="padding:1rem">
             <div class="schedule-wrap">
               <div class="schedule-grid" id="schedule-grid">
-                <div class="sc-cell sc-header">Horário</div>
-                <div class="sc-cell sc-header">Segunda</div>
-                <div class="sc-cell sc-header">Terça</div>
-                <div class="sc-cell sc-header">Quarta</div>
-                <div class="sc-cell sc-header">Quinta</div>
-                <div class="sc-cell sc-header">Sexta</div>
-                <div class="sc-cell sc-time">7h00–7h50</div>
-                <div class="sc-cell sc-aula aula-mat">Matemática</div>
-                <div class="sc-cell sc-aula aula-port">Português</div>
-                <div class="sc-cell sc-aula aula-cie">Ciências</div>
-                <div class="sc-cell sc-aula aula-hist">História</div>
-                <div class="sc-cell sc-aula aula-geo">Geografia</div>
-                <div class="sc-cell sc-time">7h50–8h40</div>
-                <div class="sc-cell sc-aula aula-port">Português</div>
-                <div class="sc-cell sc-aula aula-ing">Inglês</div>
-                <div class="sc-cell sc-aula aula-mat">Matemática</div>
-                <div class="sc-cell sc-aula aula-cie">Ciências</div>
-                <div class="sc-cell sc-aula aula-ed">Ed. Física</div>
-                <div class="sc-cell sc-time">8h40–9h30</div>
-                <div class="sc-cell sc-aula aula-hist">História</div>
-                <div class="sc-cell sc-aula aula-mat">Matemática</div>
-                <div class="sc-cell sc-aula aula-geo">Geografia</div>
-                <div class="sc-cell sc-aula aula-port">Português</div>
-                <div class="sc-cell sc-aula aula-art">Artes</div>
-                <div class="sc-cell sc-time">9h30–9h50</div>
-                <div class="sc-cell sc-break">— intervalo —</div>
-                <div class="sc-cell sc-time">9h50–10h40</div>
-                <div class="sc-cell sc-aula aula-geo">Geografia</div>
-                <div class="sc-cell sc-aula aula-cie">Ciências</div>
-                <div class="sc-cell sc-aula aula-port">Português</div>
-                <div class="sc-cell sc-aula aula-mat">Matemática</div>
-                <div class="sc-cell sc-aula aula-hist">História</div>
-                <div class="sc-cell sc-time">10h40–11h30</div>
-                <div class="sc-cell sc-aula aula-ed">Ed. Física</div>
-                <div class="sc-cell sc-aula aula-art">Artes</div>
-                <div class="sc-cell sc-aula aula-ing">Inglês</div>
-                <div class="sc-cell sc-aula aula-geo">Geografia</div>
-                <div class="sc-cell sc-aula aula-mat">Matemática</div>
+                <div class="notif-empty">Carregando horários...</div>
               </div>
             </div>
-            <div class="legend-chips">
-              <span class="tag tag-blue">Matemática</span>
-              <span class="tag tag-purple">Português</span>
-              <span class="tag tag-green">Ciências</span>
-              <span class="tag tag-orange">História</span>
-              <span class="tag tag-teal">Geografia</span>
-              <span class="tag tag-sky">Ed. Física</span>
-              <span class="tag tag-amber">Artes</span>
-              <span class="tag" style="background:#f5f3ff;color:#3730a3">Inglês</span>
-            </div>
+            <div class="legend-chips" id="horarios-legend"></div>
           </div>
         </div>
       </div>
@@ -1596,6 +1563,7 @@ function navTo(id, el) {
   if (id === 'lideranca') carregarLideranca();
   if (id === 'creditos')  carregarCreditos();
   if (id === 'configuracoes') abrirConfiguracoes();
+  if (id === 'horarios')  carregarHorarios();
 }
 
 /* ── CONFIGURAÇÕES ──────────────────────────────────────── */
@@ -2266,6 +2234,107 @@ function diasDesde(iso) {
 function tipoIcon(tipo) {
   return tipo === 'pdf' ? 'ti-file-type-pdf' : tipo === 'ppt' ? 'ti-presentation' : 'ti-file-text';
 }
+/* ── HORÁRIOS ─────────────────────────────────────────────── */
+let horarioAtual = null;
+let horarioDraft = null;
+let editandoHorario = false;
+const DIAS_SEMANA = ['Segunda','Terça','Quarta','Quinta','Sexta'];
+const CORES_DISCIPLINA = {
+  'Matemática': ['#eff6ff','#1e40af'], 'Português': ['#fdf4ff','#6b21a8'],
+  'História': ['#fff7ed','#9a3412'], 'Geografia': ['#ecfdf5','#065f46'],
+  'Ciências': ['#dcfce7','#14532d'], 'Biologia': ['#f0fdf4','#14532d'],
+  'Física': ['#fefce8','#713f12'], 'Química': ['#fff1f2','#881337'],
+  'Ed. Física': ['#f0f9ff','#0c4a6e'], 'Educação Física': ['#f0f9ff','#0c4a6e'],
+  'Filosofia': ['#fdf2f8','#831843'], 'Inglês': ['#f5f3ff','#3730a3'], 'Artes': ['#fff7ed','#92400e'],
+};
+function aulaClass(nome) {
+  const map = {
+    'Matemática':'aula-mat', 'Português':'aula-port', 'História':'aula-hist',
+    'Geografia':'aula-geo', 'Ciências':'aula-cie', 'Biologia':'aula-bio',
+    'Física':'aula-fis', 'Química':'aula-qui', 'Ed. Física':'aula-ed', 'Educação Física':'aula-ed',
+    'Filosofia':'aula-fil', 'Inglês':'aula-ing', 'Artes':'aula-art',
+  };
+  return map[nome] || 'aula-outro';
+}
+
+async function carregarHorarios() {
+  const grid = document.getElementById('schedule-grid');
+  try {
+    horarioAtual = await apiGet('/horarios');
+    document.getElementById('btn-editar-horarios').classList.toggle('hidden', !podeLiderar());
+    renderHorarios();
+  } catch (e) {
+    grid.innerHTML = '<div class="notif-empty">Não foi possível carregar os horários.</div>';
+  }
+}
+
+function renderHorarios() {
+  const grid  = document.getElementById('schedule-grid');
+  const grade = editandoHorario ? horarioDraft : horarioAtual;
+  if (!grade) return;
+
+  let html = '<div class="sc-cell sc-header">Horário</div>' +
+    DIAS_SEMANA.map(d => `<div class="sc-cell sc-header">${d}</div>`).join('');
+
+  grade.periodos.forEach((periodo, i) => {
+    const aulasDia = grade.aulas[i];
+    html += editandoHorario
+      ? `<div class="sc-cell sc-time"><input value="${escapeHtml(periodo)}" oninput="horarioDraft.periodos[${i}]=this.value" /></div>`
+      : `<div class="sc-cell sc-time">${escapeHtml(periodo)}</div>`;
+
+    if (aulasDia === null) {
+      html += '<div class="sc-cell sc-break">— intervalo —</div>';
+    } else {
+      aulasDia.forEach((nome, j) => {
+        html += editandoHorario
+          ? `<div class="sc-cell sc-aula ${aulaClass(nome)}"><input value="${escapeHtml(nome)}" oninput="horarioDraft.aulas[${i}][${j}]=this.value" /></div>`
+          : `<div class="sc-cell sc-aula ${aulaClass(nome)}">${escapeHtml(nome)}</div>`;
+      });
+    }
+  });
+
+  grid.innerHTML = html;
+  renderLegendaHorarios(grade);
+}
+
+function renderLegendaHorarios(grade) {
+  const el = document.getElementById('horarios-legend');
+  const nomes = [...new Set(grade.aulas.filter(Boolean).flat())].filter(Boolean);
+  el.innerHTML = nomes.map(n => {
+    const [bg, cor] = CORES_DISCIPLINA[n] || ['var(--surface-2)', 'var(--text-1)'];
+    return `<span class="tag" style="background:${bg};color:${cor}">${escapeHtml(n)}</span>`;
+  }).join('');
+}
+
+function iniciarEdicaoHorario() {
+  horarioDraft = JSON.parse(JSON.stringify(horarioAtual));
+  editandoHorario = true;
+  document.getElementById('btn-editar-horarios').classList.add('hidden');
+  document.getElementById('btn-cancelar-horarios').classList.remove('hidden');
+  document.getElementById('btn-salvar-horarios').classList.remove('hidden');
+  renderHorarios();
+}
+
+function cancelarEdicaoHorario() {
+  editandoHorario = false;
+  horarioDraft = null;
+  document.getElementById('btn-editar-horarios').classList.toggle('hidden', !podeLiderar());
+  document.getElementById('btn-cancelar-horarios').classList.add('hidden');
+  document.getElementById('btn-salvar-horarios').classList.add('hidden');
+  renderHorarios();
+}
+
+async function salvarHorarios() {
+  try {
+    await apiPut('/horarios', horarioDraft);
+    horarioAtual = horarioDraft;
+    cancelarEdicaoHorario();
+    toast('Horários atualizados!', 'success');
+  } catch (e) {
+    toast(e.message, 'error');
+  }
+}
+
 function discTag(disc) {
   const map = {
     'Matemática':'tag-blue','Português':'tag-purple','Ciências':'tag-green',
