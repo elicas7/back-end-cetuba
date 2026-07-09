@@ -2,6 +2,7 @@
 const router = require('express').Router();
 const pool   = require('../db');
 const { auth, podeEditar } = require('../middleware/auth');
+const { criarNotificacao } = require('./notificacoes');
 
 // GET /avisos — lista avisos da turma do usuário
 router.get('/', auth, async (req, res) => {
@@ -57,6 +58,12 @@ router.post('/', auth, podeEditar, async (req, res) => {
        RETURNING id, titulo, corpo, tipo, criado_em AS "criadoEm"`,
       [titulo, corpo, tipo, req.user.id, req.user.turma_id]
     );
+    criarNotificacao(pool, {
+      turmaId: req.user.turma_id,
+      tipo: 'aviso',
+      titulo: tipo === 'urgente' ? '🚨 Aviso urgente' : '📌 Novo aviso',
+      corpo: titulo,
+    });
     return res.status(201).json(rows[0]);
   } catch (err) {
     console.error(err);
