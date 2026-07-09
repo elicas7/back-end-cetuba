@@ -50,6 +50,12 @@ app.use('/provas',    require('./routes/provas'));
 app.use('/eventos',   require('./routes/eventos'));
 app.use('/membros',   require('./routes/membros'));
 app.use('/perfil',    require('./routes/perfil'));
+app.use('/admin',        require('./routes/admin'));
+app.use('/atualizacoes', require('./routes/atualizacoes'));
+app.use('/bugs',         require('./routes/bugs'));
+app.use('/comentarios',  require('./routes/comentarios'));
+app.use('/horarios',     require('./routes/horarios'));
+app.use('/notificacoes', require('./routes/notificacoes'));
 
 // ── Health check ───────────────────────────────────────
 app.get('/health', (req, res) => res.json({ ok: true, ts: new Date() }));
