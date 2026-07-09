@@ -141,7 +141,7 @@ body {
   overflow-y: auto; z-index: 100;
 }
 .sb-header { padding: 1.25rem 1rem 1rem; border-bottom: 1px solid var(--border-soft); }
-.sb-brand { display: flex; align-items: center; gap: 9px; margin-bottom: 1rem; }
+.sb-brand { display: flex; align-items: center; gap: 9px; margin-bottom: 1rem; position: relative; }
 .sb-brand .bicon {
   width: 32px; height: 32px; border-radius: 8px; background: var(--primary);
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
@@ -175,6 +175,44 @@ body {
   font-size: 11px; font-weight: 700; line-height: 1; border-radius: 999px;
   padding: 3px 7px; min-width: 18px; text-align: center;
 }
+
+/* ─── NOTIFICAÇÕES (sino + painel) ───────────────────────── */
+.notif-bell {
+  margin-left: auto; position: relative; border: none; background: none; cursor: pointer;
+  color: var(--text-2); font-size: 18px; padding: 6px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+}
+.notif-bell:hover { background: var(--surface-2); }
+.notif-badge {
+  position: absolute; top: 1px; right: 1px; background: var(--danger); color: #fff;
+  font-size: 10px; font-weight: 700; line-height: 1; border-radius: 999px;
+  padding: 2px 5px; min-width: 16px; text-align: center;
+}
+.notif-panel {
+  position: absolute; top: calc(100% + 8px); right: -8px; width: 320px; max-width: 85vw;
+  background: var(--surface); border: 1px solid var(--border-soft); border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0,0,0,.16); z-index: 50; overflow: hidden;
+}
+.notif-panel-header {
+  display: flex; align-items: center; justify-content: space-between; padding: 10px 14px;
+  border-bottom: 1px solid var(--border-soft); font-weight: 600; font-size: 13px;
+}
+.notif-panel-header button {
+  border: none; background: none; color: var(--primary); font-size: 11px;
+  font-weight: 600; cursor: pointer;
+}
+.notif-list { max-height: 340px; overflow-y: auto; }
+.notif-item {
+  display: flex; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--border-soft);
+  font-size: 13px; align-items: flex-start;
+}
+.notif-item:last-child { border-bottom: none; }
+.notif-item.nao-lida { background: var(--primary-light); }
+.notif-item i { font-size: 17px; color: var(--primary); margin-top: 1px; flex-shrink: 0; }
+.notif-item-titulo { font-weight: 600; color: var(--text-1); }
+.notif-item-corpo { color: var(--text-2); font-size: 12px; margin-top: 1px; }
+.notif-item-tempo { color: var(--text-3); font-size: 11px; margin-top: 3px; }
+.notif-empty { padding: 24px 14px; text-align: center; color: var(--text-3); font-size: 13px; }
 .aviso-item.nao-lido { border-left: 3px solid var(--primary, #1a56db); }
 .aviso-item .btn-marcar-lido {
   font-size: 11px; font-weight: 600; color: var(--primary, #1a56db);
@@ -693,6 +731,19 @@ body.dark .aula-qui,.dark .aula-ed,.dark .aula-fil,.dark .aula-ing,.dark .aula-a
         <div class="sb-brand">
           <div class="bicon"><i class="ti ti-school"></i></div>
           <div class="bname">Central da Turma</div>
+          <button class="notif-bell" id="notif-bell" onclick="toggleNotifPanel(event)" title="Notificações">
+            <i class="ti ti-bell"></i>
+            <span class="notif-badge hidden" id="notif-badge">0</span>
+          </button>
+          <div class="notif-panel hidden" id="notif-panel">
+            <div class="notif-panel-header">
+              <span>Notificações</span>
+              <button onclick="marcarTodasLidas()">Marcar todas como lidas</button>
+            </div>
+            <div class="notif-list" id="notif-list">
+              <div class="notif-empty">Carregando...</div>
+            </div>
+          </div>
         </div>
         <div class="sb-user">
           <div class="sb-avatar" id="sb-avatar">--</div>
@@ -1217,6 +1268,9 @@ const BASE_URL = (location.hostname === 'localhost' || location.hostname === '12
 
 let token = sessionStorage.getItem('ct_token') || null;
 let currentUser = null;
+let notificacoes = [];
+let notifPanelAberto = false;
+let notifEventSource = null;
 
 /* ── Hierarquia de cargos (maior número = mais permissão) ── */
 const NIVEL_CARGO = {
@@ -1342,6 +1396,16 @@ window.addEventListener('DOMContentLoaded', () => {
   renderCalendario();
 });
 
+document.addEventListener('click', (e) => {
+  if (!notifPanelAberto) return;
+  const panel = document.getElementById('notif-panel');
+  const bell  = document.getElementById('notif-bell');
+  if (panel && bell && !panel.contains(e.target) && !bell.contains(e.target)) {
+    panel.classList.add('hidden');
+    notifPanelAberto = false;
+  }
+});
+
 /* ── AUTH ───────────────────────────────────────────────── */
 async function doLogin() {
   const usuario = document.getElementById('inp-user').value.trim();
@@ -1368,6 +1432,8 @@ async function doLogin() {
 function doLogout() {
   token = null; currentUser = null;
   sessionStorage.removeItem('ct_token');
+  if (notifEventSource) { notifEventSource.close(); notifEventSource = null; }
+  notificacoes = [];
   document.getElementById('app').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('inp-user').value = '';
@@ -1413,10 +1479,93 @@ function initApp() {
 
   navTo('inicio', document.querySelector('.nav-item'));
   carregarDados();
+  carregarNotificacoes();
+  conectarNotificacoesSSE();
 }
 
 function iniciais(nome) {
   return nome.split(' ').slice(0,2).map(n=>n[0]).join('').toUpperCase();
+}
+
+/* ── NOTIFICAÇÕES ─────────────────────────────────────────── */
+function iconeNotif(tipo) {
+  return {
+    aviso: 'ti-speakerphone', prova: 'ti-writing', evento: 'ti-calendar-event',
+    material: 'ti-file', geral: 'ti-bell',
+  }[tipo] || 'ti-bell';
+}
+
+function tempoRelativo(iso) {
+  if (!iso) return '';
+  const diffSeg = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+  if (diffSeg < 60) return 'agora mesmo';
+  if (diffSeg < 3600) return `há ${Math.floor(diffSeg/60)} min`;
+  if (diffSeg < 86400) return `há ${Math.floor(diffSeg/3600)}h`;
+  const dias = Math.floor(diffSeg/86400);
+  if (dias < 7) return `há ${dias} dia${dias>1?'s':''}`;
+  return formatData(iso.slice(0,10));
+}
+
+async function carregarNotificacoes() {
+  try {
+    notificacoes = await apiGet('/notificacoes');
+    renderNotificacoes();
+  } catch (e) { console.error('Notificações:', e.message); }
+}
+
+function renderNotificacoes() {
+  const list  = document.getElementById('notif-list');
+  const badge = document.getElementById('notif-badge');
+  const naoLidas = notificacoes.filter(n => !n.lida).length;
+
+  badge.textContent = naoLidas > 9 ? '9+' : naoLidas;
+  badge.classList.toggle('hidden', naoLidas === 0);
+
+  if (!notificacoes.length) {
+    list.innerHTML = '<div class="notif-empty">Nenhuma notificação ainda.</div>';
+    return;
+  }
+  list.innerHTML = notificacoes.map(n => `
+    <div class="notif-item ${n.lida ? '' : 'nao-lida'}">
+      <i class="ti ${iconeNotif(n.tipo)}"></i>
+      <div>
+        <div class="notif-item-titulo">${escapeHtml(n.titulo)}</div>
+        ${n.corpo ? `<div class="notif-item-corpo">${escapeHtml(n.corpo)}</div>` : ''}
+        <div class="notif-item-tempo">${tempoRelativo(n.criadoEm)}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleNotifPanel(e) {
+  e?.stopPropagation();
+  const panel = document.getElementById('notif-panel');
+  notifPanelAberto = !notifPanelAberto;
+  panel.classList.toggle('hidden', !notifPanelAberto);
+  if (notifPanelAberto) carregarNotificacoes();
+}
+
+async function marcarTodasLidas() {
+  try {
+    await apiFetch('/notificacoes/ler-todas', { method: 'PATCH' });
+    notificacoes = notificacoes.map(n => ({ ...n, lida: true }));
+    renderNotificacoes();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+function conectarNotificacoesSSE() {
+  if (!token) return;
+  if (notifEventSource) notifEventSource.close();
+  notifEventSource = new EventSource(BASE_URL + '/notificacoes/stream?token=' + encodeURIComponent(token));
+  notifEventSource.onmessage = (e) => {
+    try {
+      const dado = JSON.parse(e.data);
+      notificacoes.unshift({ id: 'live-' + Date.now(), tipo: dado.tipo, titulo: dado.titulo, corpo: dado.corpo, lida: false, criadoEm: dado.criadoEm });
+      renderNotificacoes();
+      toast(dado.titulo, 'default');
+    } catch (_) {}
+  };
+  // EventSource reconecta sozinho em caso de queda; nada extra a fazer aqui.
 }
 
 /* ── TEMA DARK ──────────────────────────────────────────── */
